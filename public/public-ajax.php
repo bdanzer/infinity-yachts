@@ -201,7 +201,7 @@ function form_start() {
 
 		//Remove posts that don't meat criteria
 		if ($remove_yacht['yacht_id'] != $yacht_boat['id']){
-			create_boat($yacht_boat['yacht_image'], $yacht_boat['yacht_name'], $yacht_boat['price_from'], $yacht_boat['price_to'], $yacht_boat['guests'], $yacht_boat['staterooms'], $yacht_boat['boat_type'], $yacht_boat['length'], $yacht_boat['yacht_url']);
+			create_boat($yacht_boat);
 
 			$yachts_removed[] = $yacht_boat['id'];
 		}

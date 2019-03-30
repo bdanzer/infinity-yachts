@@ -1,0 +1,35 @@
+{
+    "name": "iyc/infinity-yachts",
+    "version": "master",
+    "description": "Plugin to help manage CYA feed",
+    "type":"wordpress-plugin",
+    "minimum-stability" : "stable",
+    "authors": [
+        {
+            "name": "Britt Danzer",
+            "email": "britt.danzer@gmail.com"
+        }
+    ],
+    "extra": {
+        "installer-paths": {
+        "../../plugins/{$name}/": [
+          "wpackagist-plugin/*",
+          "type:wordpress-plugin"
+        ]
+        }
+      },
+    "require": {
+        "timber/timber": "^1.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "IYC\\": ["includes"]
+        }
+    },
+    "repositories": [
+      {
+        "type": "composer",
+        "url": "https://wpackagist.org"
+      }
+    ]
+  }

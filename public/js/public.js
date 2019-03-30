@@ -19,7 +19,7 @@ jQuery(document).ready(function($) {
 		$("input#submit").attr("disabled");
 
 		// add loading message
-		$('.ajax-response').html('<div class="danzerpress-col-1"><h2 class="danzerpress-title">Searching for Yachts</h2><img style="display:block;margin:auto;max-width: 90px;margin-top:20px;" src="https://testing.bdanzer.com/wp-content/uploads/2018/03/ajax-loader-gif-6.gif"></div>').show().fadeIn();
+		$('.ajax-response').html('<div class="danzerpress-col-1"><h2 class="danzerpress-title">Searching for Yachts</h2><img style="display:block;margin:auto;max-width: 90px;margin-top:20px;" src="/wp-content/uploads/2018/03/ajax-loader-gif-6.gif"></div>').show().fadeIn();
 		
 		jQuery.ajax({
 			type: 'POST',

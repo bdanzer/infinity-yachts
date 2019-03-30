@@ -12,10 +12,7 @@ jQuery(document).ready(function($) {
 		}
 		
 		// add loading message
-		$('.ajax-response').html('<img style="display:block;margin:auto;max-width: 90px;margin-top:20px;" src="https://testing.bdanzer.com/wp-content/uploads/2018/03/ajax-loader-gif-6.gif">');
-		
-
-		console.log(ylocations);
+		$('.ajax-response').html('<img style="display:block;margin:auto;max-width: 90px;margin-top:20px;" src="/wp-content/uploads/2018/03/ajax-loader-gif-6.gif">');
 		
 		// submit the data
 		$.post(ajaxurl, {
@@ -71,7 +68,7 @@ jQuery(document).ready(function($) {
 		// submit the data
 
 		// add loading message
-		$('.danzerpress-save').html('<h2>Changes Pending:</h2><img style="display:block;margin:auto;max-width: 90px;margin-top:20px;" src="https://testing.bdanzer.com/wp-content/uploads/2018/03/ajax-loader-gif-6.gif">').show().fadeIn();
+		$('.danzerpress-save').html('<h2>Changes Pending:</h2><img style="display:block;margin:auto;max-width: 90px;margin-top:20px;" src="/wp-content/uploads/2018/03/ajax-loader-gif-6.gif">').show().fadeIn();
 		
 		jQuery.ajax({
 			type: 'POST',

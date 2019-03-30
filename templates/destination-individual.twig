@@ -1,0 +1,37 @@
+{% extends 'base-yacht.twig' %}
+
+{% block body %}
+    <div class="danzerpress-container-fw" style="padding: 40px 0;">
+        <div class="danzerpress-wrap">
+            <div class="danzerpress-flex-row danzerpress-row-fix">
+                <div class="danzerpress-two-thirds">
+                    <h2>Gallery</h2>
+                    <div class="danzerpress-flex-row">
+                        {% for image in images %}
+                            <div class="danzerpress-col-4 danzerpress-fix danzerpress-md-3 danzerpress-sm-2 danzerpress-xs-2 wow zoomIn">
+                                <div class="container" style="overflow:hidden;">
+                                    <a data-fancybox="yacht" href="{{ image.sizes.large}}"><img class="content" src="{{ image.sizes.large}}"></a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <h2>About {{ post.title|capitalize }}</h2>
+                        <div class="">
+                            {{ post.content }}
+                        </div>
+                    <br>
+                        
+                    <h2 style="margin-bottom: 20px;">Yachts Available in {{ post.title|capitalize }}</h2>
+                    <div class="danzerpress-flex-row danzerpress-row-fix">
+                        {{ boats }}
+                    </div>
+                </div>
+
+                <div class="danzerpress-one-third">
+                    {{ sidebar }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

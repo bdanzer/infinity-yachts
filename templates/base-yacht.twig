@@ -1,0 +1,24 @@
+<!doctype html>
+<html {{ function('language_attributes') }}>
+    {% block header %}
+        {{ fn('get_header') }}
+    {% endblock %}
+
+    {% block body %}
+        <main class="main-content">
+            <div class="danzerpress-wrap">
+                {% block content %}
+                    {% include 'parts/content-w-sidebar.twig' %}
+                {% endblock %}
+            </div>
+        </main>
+
+        {# {% block comments %}
+            {% include 'parts/comments.twig' %}
+        {% endblock %} #}
+    {% endblock %}
+
+    {% block footer %}
+        {{ fn('get_footer') }}
+    {% endblock %}
+</html>

@@ -3,37 +3,72 @@ namespace IYC;
 
 final class API 
 {
-    private $user_id = '128';
-    private $domain = 'infinityyachts.com';
-    private $apicode = '128Sx%$yerO9s3';
+    private static $user_id = '128';
+    private static $domain = 'infinityyachts.com';
+    private static  $apicode = '128Sx%$yerO9s3';
 
     public function __construct() {}
 
-    public function url_builder(string $url, array $data) 
+    public static function url_builder(string $url, array $query_data = []) 
     {
-        return $url . '&' . build_query($data);
+        if (empty($query_data)) {
+            return $url;
+        }
+
+        return $url . '&' . build_query($query_data);
     }
 
-    public function get_cya_locations() 
+    public static function get_xml_locations_url() 
     {
-        return xml_array('http://www.centralyachtagent.com/snapins/xmllocations2.php');
+        return 'https://www.centralyachtagent.com/snapins/xmllocations2.php';
     }
 
-    public function get_xml_snyachts_url() 
+    public static function get_xml_snyachts_url($query_data = NULL) 
     {
-        return 'http://www.centralyachtagent.com/snapins/snyachts-xml.php?user=' . $this->user_id . '';
+        $defaults = [
+            'ylocations' => '', //can pass array of locations like src35=1, src36=1 for multiple
+            'boattype' => '',
+            'guests' => '',
+            'startdate' => '',
+            'enddate' => '',
+            'yachtname' => '',
+            'pricefrom' => '',
+            'priceto' => '',
+            'captainonly' => '',
+            'sailinstructions' => '',
+            'deckjacuzzi' => '',
+            'helipad' => '',
+            'scubadet' => ''
+        ];
+
+        return self::url_builder('https://www.centralyachtagent.com/snapins/snyachts-xml.php?user=' . self::$user_id, $query_data);
     }
 
-    public function get_xml_ebrochure_url($yacht_id = NULL) 
+    public static function get_xml_ebrochure_url($yacht_id = NULL) 
     {
-        if ($yacht_id === NULL) {
+        if (!$yacht_id) {
             $id = get_the_ID();
         }
         
-        return 'https://www.centralyachtagent.com/snapins/ebrochure-xml.php?user=' . $this->user_id . '&idin=' . $yacht_id . '&act=' . $this->domain . '&apicode=' . $this->apicode . '';
+        return 'https://www.centralyachtagent.com/snapins/ebrochure-xml.php?user=' . self::$user_id . '&idin=' . $yacht_id . '&act=' . self::$domain . '&apicode=' . self::$apicode . '';
+    }
+
+    public static function get_xml_locations_array() 
+    {
+        return self::xml_array(self::get_xml_locations_url());
+    }
+
+    public static function get_xml_snyachts_array($yacht_id = NULL, $query_data = NULL) 
+    {
+        return self::xml_array(self::get_xml_snyachts_url($yacht_id, $query_data));
+    }
+
+    public static function get_xml_ebrochure_array($yacht_id = NULL) 
+    {
+        return self::xml_array(self::get_xml_ebrochure_url($yacht_id));
     }
     
-    public function xml_array($url, $yacht_id = NULL) 
+    public static function xml_array($url) 
     {
         $xml = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA);
         $xml_array = json_decode(json_encode((array) $xml), true);

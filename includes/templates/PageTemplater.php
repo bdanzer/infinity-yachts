@@ -1,5 +1,5 @@
 <?php
-namespace IYC;
+namespace IYC\templates;
 
 class PageTemplater 
 {

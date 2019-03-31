@@ -23,9 +23,7 @@ function destination_individual($context)
 
         //Finding if boat exists in location
         $yacht_locations = explode(', ', $yacht_boat['location']);
-        var_dump($yacht_boat['location']);
-        die;
-
+        
         //Adding each boat that fits each location to the $yacht_boats_in_location[] array
         foreach ($yacht_locations as $yacht_location) {
 

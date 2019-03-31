@@ -29,12 +29,6 @@ function render($template, $context) {
 	Timber\Timber::render($template, $context);
 }
 
-add_filter('template_include', 'set_controller_wp_template', 11);
-function set_controller_wp_template($t){
-	IYC\controllers\Controller::set_wp_template($t);	
-	return $t;
-}
-
 
 /*--------------------------------------------------------------
 ##XML Functions

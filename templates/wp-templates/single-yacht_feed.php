@@ -451,7 +451,7 @@
 
 				</div>
 				<div id="" class="danzerpress-one-third">
-					<?php ccm_get_template_part('template-parts/content','sidebar'); ?>
+					<?php Timber\Timber::render('parts/content-sidebar.twig'); ?>
 				</div>
 			</div>
 		</main><!-- #main -->

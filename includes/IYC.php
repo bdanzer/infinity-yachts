@@ -1,13 +1,42 @@
 <?php
 namespace IYC;
 
+use Timber\Timber;
+
 class IYC 
 {
     public function __construct()
     {
+        $timber = new Timber();
+        $timber::$dirname = 'templates';
+        $timber::$locations = [
+            get_iyc_dir() . 'templates'
+        ];
+
         add_action('init', [$this, 'yacht_setup_post_type']);
         add_action('init', [$this, 'review_setup_post_type']);
         add_action('admin_enqueue_scripts', [$this, 'load_custom_wp_admin_style']);
+
+        // include plugin dependencies: admin only
+        if ( is_admin() ) {
+            require_once get_iyc_dir() . 'admin/admin-menu.php';
+            require_once get_iyc_dir() . 'admin/settings-page.php';
+            
+            new Settings;
+            //new IYC\WPCron;
+        }
+
+        new Ajax;
+        new templates\WPHierarchy;
+
+        // include plugin dependencies: admin and public
+        require_once get_iyc_dir() . 'public/public-ajax.php';
+        require_once get_iyc_dir() . 'includes/filters.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+
+        add_action('plugins_loaded', [templates\PageTemplater::class, 'get_instance']);
     }
 
     public function yacht_setup_post_type() {

@@ -8,21 +8,22 @@ use Timber\Timber;
  */
 class Controller 
 {
-    protected $template = [];
+    protected $template;
     protected static $wp_template = '';
     protected $context = [];
     protected $post_id;
     protected $template_stack = [];
     protected static $extension = '.twig';
+    protected static $template_hierarchy = [];
 
-    public function __construct(string $template, $force_template = false) 
+    public function __construct(string $template = '', $force_template = false) 
     {
         $this->context = get_context();
         $this->post_id = (get_the_ID()) ?: null;
         $this->template = $template;
         $this->set_template_stack();
+        $this->set_content_template_stack();
         $this->init();
-        $this->set_context_template_stack();
         /**
          * Unsets wp templates and puts template first if force_template is true,
          * useful if other teplates are loaded not by wp template_include hook
@@ -38,12 +39,14 @@ class Controller
      * Initializes class after everything is set
      */
     public function init() {} //override this method
+
     public function remove_template($needle, array $stack)
     {
         if (($key = array_search($needle, $stack)) !== false) {
             unset($this->stack[$key]);
         }
     }
+
     /**
      * Sets WP file first in template stack for twig 
      * to load by default if not force_template
@@ -53,22 +56,47 @@ class Controller
      */
     public function set_template_stack()
     {
-        $this->template_stack[] = self::$wp_template;
-        $this->template_stack = $this->merge_helper($this->template_stack, $this->template);
+        /**
+         * Change the php extensions to .twig
+         */
+        $this->template_stack = array_map(function($template) {
+            return basename($template, '.php') . self::$extension;
+        }, self::$template_hierarchy);
+
+        // $this->template_stack[] = self::$wp_template;
+        // $this->template_stack = $this->merge_helper($this->template_stack, $this->template);
     }
-    public function set_context_template_stack()
+
+    public function set_content_template_stack()
     {
-        $this->context['templates'] = [
-            'parts/content-' . self::$wp_template,
-            'parts/content-' . get_post_type(),
-            'parts/content-' . $this->template,
-            'parts/content.twig' //if all else fails let's load content.twig as a default
-        ];
+        /**
+         * adding content_stack context based on the template_stack
+         */
+        $this->context['content_stack'] = array_map(function($template) {
+            return 'content-' . $template;
+        }, $this->template_stack);
     }
+
+    /**
+     * Sets WP Template Hiearchy stack
+     */
+    public static function set_wp_hierarchy_stack($templates) 
+    {
+        self::$template_hierarchy = array_merge(self::$template_hierarchy, $templates);
+        self::$template_hierarchy = array_unique(self::$template_hierarchy);
+        return $templates;
+    }
+
+    public static function get_wp_heirarchy_stack() 
+    {
+        return self::$template_hierarchy;
+    }
+
     public function add_template($template)
     {
         $this->template = $this->merge_helper($this->template, $template);
     }
+
     /**
      * Helps merge non arrays to arrays
      */
@@ -81,6 +109,7 @@ class Controller
         }
         return $arr_to_merge;
     }
+
     /**
      * This allows us to hook into wordpress core standards
      */
@@ -88,13 +117,24 @@ class Controller
     {
         self::$wp_template = basename($template, '.php') . self::$extension;
     }
+
+    public static function get_wp_template() 
+    {
+        return self::$wp_template;
+    }
+
     public function add_context(array $context = [])
     {
         $this->context = array_merge($this->context, $context);
     }
+
     public function render()
     {
-        $template_base = basename($this->template, '.twig');
+        if (!empty($this->template)) {
+            $template_base = basename($this->template, '.twig');
+        } else {
+            $template_base = basename($this->template_stack[0], '.twig');
+        }
 
         $template_stack = apply_filters('pre_render_template_stack', $this->template_stack);
         $context = apply_filters('pre_render_context', $this->context);

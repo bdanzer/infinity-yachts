@@ -9,19 +9,16 @@ use Timber\Timber;
 class Controller 
 {
     protected $template;
-    protected static $wp_template = '';
     protected $context = [];
     protected $post_id;
     protected $template_stack = [];
-    protected static $extension = '.twig';
-    protected static $template_hierarchy = [];
 
-    public function __construct(string $template = '', $force_template = false) 
+    public function __construct($template = '', $force_template = false) 
     {
         $this->context = get_context();
         $this->post_id = (get_the_ID()) ?: null;
         $this->template = $template;
-        $this->set_template_stack();
+        $this->set_template_stack($template);
         $this->set_content_template_stack();
         $this->init();
         /**
@@ -31,7 +28,6 @@ class Controller
          */
         if ($force_template) {
             $this->template_stack = $template;
-            self::$wp_template = $template;
         }
     }
     
@@ -54,17 +50,12 @@ class Controller
      * wordpress is looking for. This basically helps for
      * custom page templates.
      */
-    public function set_template_stack()
+    public function set_template_stack($templates)
     {
         /**
          * Change the php extensions to .twig
          */
-        $this->template_stack = array_map(function($template) {
-            return basename($template, '.php') . self::$extension;
-        }, self::$template_hierarchy);
-
-        // $this->template_stack[] = self::$wp_template;
-        // $this->template_stack = $this->merge_helper($this->template_stack, $this->template);
+        $this->template_stack = $this->merge_helper($this->template_stack, $templates);
     }
 
     public function set_content_template_stack()
@@ -75,21 +66,6 @@ class Controller
         $this->context['content_stack'] = array_map(function($template) {
             return 'content-' . $template;
         }, $this->template_stack);
-    }
-
-    /**
-     * Sets WP Template Hiearchy stack
-     */
-    public static function set_wp_hierarchy_stack($templates) 
-    {
-        self::$template_hierarchy = array_merge(self::$template_hierarchy, $templates);
-        self::$template_hierarchy = array_unique(self::$template_hierarchy);
-        return $templates;
-    }
-
-    public static function get_wp_heirarchy_stack() 
-    {
-        return self::$template_hierarchy;
     }
 
     public function add_template($template)
@@ -110,19 +86,6 @@ class Controller
         return $arr_to_merge;
     }
 
-    /**
-     * This allows us to hook into wordpress core standards
-     */
-    public static function set_wp_template($template)
-    {
-        self::$wp_template = basename($template, '.php') . self::$extension;
-    }
-
-    public static function get_wp_template() 
-    {
-        return self::$wp_template;
-    }
-
     public function add_context(array $context = [])
     {
         $this->context = array_merge($this->context, $context);
@@ -130,7 +93,7 @@ class Controller
 
     public function render()
     {
-        if (!empty($this->template)) {
+        if (!empty($this->template) && !is_array($this->template)) {
             $template_base = basename($this->template, '.twig');
         } else {
             $template_base = basename($this->template_stack[0], '.twig');

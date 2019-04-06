@@ -1,0 +1,14 @@
+<div class="danzerpress-col-2 wow fadeIn danzerpress-flex-column" style="margin-bottom: 20px;">
+    <div class="danzerpress-box" style="line-height: inherit; padding: 0px;">
+        <div style="overflow:hidden; line-height: 0px;"><a href="{{ link }}"><img style="height: 100%;max-height: 200px;object-fit: cover;width: 100%;" src="{{ thumbnail.src }}"></a></div>
+        <table class="yacht-specs danzerpress-box danzerpress-white danzerpress-shadow-3" style="margin:0px;">
+            <tr><td style="">Name</td><td style="color:black;font-weight:700;">{{ title|uppercase }}</td></tr>
+            <tr><td>Price From</td><td> ${{ price_from|number_format }} - ${{ price_to|number_format }}</td></tr>
+            <tr><td>Guests</td><td>{{ guests }}</td></tr>
+            <tr><td>Staterooms</td><td>{{ staterooms }}</td></tr>
+            <tr><td>Yacht Type</td><td>{{ boat_type|capitalize }}</td></tr>
+            <tr><td>Yacht length</td><td>{{ length_feet }} ft</td></tr>
+        </table>
+        <a style="display:block;border-radius:0px;" class="danzerpress-button-modern" href="{{ link }}">{{ button_text }}</a>
+    </div>
+</div>

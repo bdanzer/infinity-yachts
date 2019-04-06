@@ -7,6 +7,7 @@ class Context
     {
         return [
             'body_class' => get_body_class(),
+            'component' => new components\Components()
         ];
     }
 }

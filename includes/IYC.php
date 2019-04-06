@@ -28,6 +28,7 @@ class IYC
 
         new Ajax;
         new templates\WPHierarchy;
+        new Twig;
 
         // include plugin dependencies: admin and public
         require_once get_iyc_dir() . 'public/public-ajax.php';

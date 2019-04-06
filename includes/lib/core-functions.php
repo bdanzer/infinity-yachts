@@ -29,6 +29,105 @@ function render($template, $context) {
 	Timber\Timber::render($template, $context);
 }
 
+function component_render($component, array $context = []) {
+	$components = new IYC\components\Components();
+	$components->$component($context);
+}
+
+function yacht_feed_search($sql, $wp_query) {
+	$yacht_name = sanitize_text_field($_POST['yachtName']);
+
+	if ($wp_query->get('post_type') === 'yacht_feed') {
+		$sql = "AND `post_title` LIKE '%{$yacht_name}%'" . $sql;
+	}
+	return $sql;
+}
+
+function get_yacht_price($case) {
+	$price_arr = [];
+	
+	switch ($case) {
+		case 0:
+	    	$price_arr['price_from'] = 1;
+	    	$price_arr['price_to'] = 50000;
+	    	break;
+	    case 1:
+	        $price_arr['price_from'] = 1;
+	        $price_arr['price_to'] = 9999;
+	        break;
+	    case 2:
+	        $price_arr['price_from'] = 10000;
+	        $price_arr['price_to'] = 19999;
+	        break;
+	    case 3:
+	        $price_arr['price_from'] = 20000;
+	        $price_arr['price_to'] = 29999;
+	        break;
+	    case 4:
+	        $price_arr['price_from'] = 30000;
+	        $price_arr['price_to'] = 49999;
+	        break;
+	    case 5:
+	        $price_arr['price_from'] = 50000;
+	        $price_arr['price_to'] = 100000;
+	        break;
+	    case 6:
+	        $price_arr['price_from'] = 100001;
+	        $price_arr['price_to'] = 999999;
+	        break;
+	}
+
+	return $price_arr;
+}
+
+function get_yacht_length($case) {
+	$length_arr = [];
+	switch ($case) {
+		case 0:
+			$length_arr['length_from'] = 'all';
+			$length_arr['length_to'] = 'all';
+			break;
+		case 1:
+	    	$length_arr['length_from'] = 1;
+	    	$length_arr['length_to'] = 49;
+	    	break;
+	    case 2:
+	        $length_arr['length_from'] = 50;
+	        $length_arr['length_to'] = 59;
+	        break;
+	    case 3:
+	        $length_arr['length_from'] = 60;
+	        $length_arr['length_to'] = 79;
+	        break;
+	    case 4:
+	        $length_arr['length_from'] = 80;
+	        $length_arr['length_to'] = 99;
+	        break;
+	    case 5:
+	        $length_arr['length_from'] = 100;
+	        $length_arr['length_to'] = 119;
+	        break;  
+	    case 6:
+	        $length_arr['length_from'] = 120;
+	        $length_arr['length_to'] = 139;
+	        break;
+	    case 7:
+	        $length_arr['length_from'] = 140;
+	        $length_arr['length_to'] = 169;
+	        break;
+	    case 8:
+	        $length_arr['length_from'] = 170;
+	        $length_arr['length_to'] = 199;
+	        break;
+	    case 9:
+	        $length_arr['length_from'] = 200;
+	        $length_arr['length_to'] = 50000;
+	        break;    
+	}
+
+	return $length_arr;
+}
+
 
 /*--------------------------------------------------------------
 ##XML Functions

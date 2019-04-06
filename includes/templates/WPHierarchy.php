@@ -3,6 +3,7 @@ namespace IYC\templates;
 
 use IYC\controllers\Controller;
 use IYC\IYC;
+use Timber\Timber;
 
 class WPHierarchy 
 {
@@ -87,9 +88,9 @@ class WPHierarchy
          * then break and load that file
          */
         foreach ($this->wp_template_hierarchy as $template) {
-            if (is_file(IYC::get_dir() . 'templates/wp-templates/' . $template)) {
+            if (is_file(IYC::get_dir() . '/' . Timber::$dirname . '/wp-templates/' . $template)) {
                 $this->wp_template = $template;
-                $wp_template = IYC::get_dir() . 'templates/wp-templates/' . $template;
+                $wp_template = IYC::get_dir() . '/' . Timber::$dirname . '/wp-templates/' . $template;
                 break;
             }
         }

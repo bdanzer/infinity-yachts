@@ -53,6 +53,15 @@ final class API
         return 'https://www.centralyachtagent.com/snapins/ebrochure-xml.php?user=' . self::$user_id . '&idin=' . $yacht_id . '&act=' . self::$domain . '&apicode=' . self::$apicode . '';
     }
 
+    public static function get_xml_carates_url($yacht_id = NULL) 
+    {
+        if (!$yacht_id) {
+            $id = get_the_ID();
+        }
+
+        return 'https://www.centralyachtagent.com/snapins/carates-xml.php?idin='. $yacht_id . '&user=' . self::$user_id;
+    }
+
     public static function get_xml_locations_array() 
     {
         return self::xml_array(self::get_xml_locations_url());
@@ -66,6 +75,11 @@ final class API
     public static function get_xml_ebrochure_array($yacht_id = NULL) 
     {
         return self::xml_array(self::get_xml_ebrochure_url($yacht_id));
+    }
+
+    public static function get_xml_carates_array($yacht_id = NULL) 
+    {
+        return self::xml_array(self::get_xml_carates_url($yacht_id));
     }
     
     public static function xml_array($url) 

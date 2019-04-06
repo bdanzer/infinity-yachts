@@ -4,7 +4,7 @@
 
 <?php get_header(); ?>
 
-<div class="danzerpress-container-fw" style="padding: 40px 0;">
+<div class="danzerpress-container-fw load-boats" style="padding: 40px 0;">
 	<div class="danzerpress-wrap">
 		<div class="danzerpress-flex-row danzerpress-row-fix">
 			<div class="danzerpress-one-third">

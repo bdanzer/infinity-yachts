@@ -1,11 +1,21 @@
-jQuery(document).ready(function($) {
-
+jQuery(document).ready(function($) 
+{
 	$.noConflict();
-    "use strict";
+	"use strict";
+	
+	if ($('.load-boats')) {
+		$('.load-boats').removeClass('load-boats');
+		load_boats()
+	}
 
-    $('#yacht-form').on( 'submit', function(event) {
-
-	    event.preventDefault();
+    $('#yacht-form').on('submit', function(event) {
+		load_boats(event);
+	});
+	
+	function load_boats(event = null) {
+		if (event) {
+			event.preventDefault();
+		}
 	    
 		//vars
 		var ylocations = $('#ylocations').val();
@@ -35,21 +45,15 @@ jQuery(document).ready(function($) {
 				yachtName: yachtName,
 				yachtLen: yachtLen,
 			},
-		}).error( 
-	            function() {
-	                alert('error');
-	            }).success( function(data) {
+		}).error(function() {
+			alert('error');
+		}).success(function(data) {
+			// display data
+			$('.ajax-response').html(data);
 			
-					// log data
-					// console.log(data);
-					
-					// display data
-					$('.ajax-response').html(data);
-					
-				});
-	            $("input#submit").removeAttr("disabled");
-	            return false;
+		});
 
-	});
-	
+		$("input#submit").removeAttr("disabled");
+		return false;
+	}
 });

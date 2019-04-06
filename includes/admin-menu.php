@@ -32,7 +32,7 @@ function http_get_add_toplevel_menu() {
 			'CYA Yachts',
 			'moderate_comments',
 			'danzerpress',
-			'danzerpress_display_settings_page',
+			[IYC\Settings::class, 'danzerpress_display_settings_page'],
 			get_home_url() . '/wp-content/uploads/2018/01/danzerpressofficial-e1519213344817.png',
 			null
 		);

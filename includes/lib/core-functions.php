@@ -29,6 +29,10 @@ function render($template, $context) {
 	Timber\Timber::render($template, $context);
 }
 
+function dp_add_metabox($args, $context = []) {
+	$metabox = new IYC\metabox\Metabox($args, $context);
+}
+
 function component_render($component, array $context = []) {
 	$components = new IYC\components\Components();
 	$components->$component($context);
@@ -48,8 +52,8 @@ function get_yacht_price($case) {
 	
 	switch ($case) {
 		case 0:
-	    	$price_arr['price_from'] = 1;
-	    	$price_arr['price_to'] = 50000;
+	    	$price_arr['price_from'] = 'all';
+	    	$price_arr['price_to'] = 'all';
 	    	break;
 	    case 1:
 	        $price_arr['price_from'] = 1;
@@ -285,10 +289,40 @@ function create_location_pages($array = null) {
 	}
 }
 
+function format_shitty_cya_feed_locations() {
+	global $locations;
+
+	$not_shitty_locations_array = [];
+
+	foreach ($locations as $location) {
+		$not_shitty_locations_array[$location['locationCode']] = strtolower($location['locationName']);
+	}
+
+	return $not_shitty_locations_array;
+}
+
+/*Get locations*/
+function get_location_codes($summer_locations, $winter_locations) {
+	global $formatted_shitty_cya_feed_locations;
+
+	$summer_locations = apply_filters('iyc_summer_locations', explode(", ", $summer_locations));
+	$winter_locations = apply_filters('iyc_winter_locations', explode(", ", $winter_locations));
+
+	$winter_locations = [];
+
+	$locations = apply_filters('iyc_locations', array_unique(array_merge($summer_locations, $winter_locations)));
+
+	foreach ($locations as $location) {
+		$location_codes[] = array_search($location, $formatted_shitty_cya_feed_locations);
+	}
+
+	return apply_filters('iyc_location_codes', $location_codes);
+}
+
 /*Get locations*/
 function get_locations($summer_locations, $winter_locations) {
-	//All the locations in the xml feed
-	$specific_locations = set_locations();
+	var_dump(get_location_codes($summer_locations, $winter_locations));
+	die;
 
 	$locations_summer = strtolower((string)$summer_locations);
 	$locations_winter = strtolower((string)$winter_locations);
@@ -482,10 +516,10 @@ function cya_feed_content($yacht_id) {
 		'cruise_speed' => strtolower($xml_ebrochure['yachtCruiseSpeed']),
 		'cruise_max_speed' => strtolower($xml_ebrochure['yachtMaxSpeed']),
 		'currency' => $currency_type,
-		'price_from' => preg_replace("/[^0-9]/", "", str_replace($currency, '', $xml_ebrochure['yachtLowPrice'])),
-		'price_to' => preg_replace("/[^0-9]/", "", str_replace($currency, '', $xml_ebrochure['yachtHighPrice'])),
+		'price_from' => filter_var(str_replace($currency, '', $xml_ebrochure['yachtLowPrice']), FILTER_SANITIZE_NUMBER_INT),
+		'price_to' => filter_var(str_replace($currency, '', $xml_ebrochure['yachtHighPrice']), FILTER_SANITIZE_NUMBER_INT),
 		'boat_type' => $xml_ebrochure['yachtType'],
-		'locations_added' => get_locations($xml_ebrochure['yachtSummerArea'], $xml_ebrochure['yachtWinterArea']),
+		'locations_added' => get_location_codes($xml_ebrochure['yachtSummerArea'], $xml_ebrochure['yachtWinterArea']),
 		'image' => $xml_ebrochure['yachtPic1'],
 		'desc' => $xml_ebrochure['yachtDesc1'],
 		'dingy' => $xml_ebrochure['yachtDinghy'],
@@ -515,42 +549,46 @@ function cya_acf_fields($cya_feed_content = NULL, $yacht_id = NULL) {
 		$cya_feed_content = cya_feed_content($yacht_id);
 	}
 
-	$acf_fields = array(
-		array($cya_feed_content['content'], 'field_5a69b88d45254', 'boat_description'),
-		array($cya_feed_content['guests'], 'field_5a9371571b4de', 'guests'),
-		array($cya_feed_content['staterooms'], 'field_5a93719456d2a', 'staterooms'),
-		array($cya_feed_content['length_feet'], 'field_5a9371a356d2b', 'length_feet'),
-		array($cya_feed_content['length_meters'], 'field_5a9371b556d2c', 'length_meters'),
-		array($cya_feed_content['beam'], 'field_5a9371bc56d2d', 'beam'),
-		array($cya_feed_content['draft'], 'field_5a9371c856d2e', 'draft'),
-		array($cya_feed_content['built'], 'field_5a9371d556d2f', 'built'),
-		array($cya_feed_content['refit'], 'field_5a9371d856d30', 'refit'),
-		array($cya_feed_content['builder'], 'field_5a9371e156d31', 'builder'),
-		array($cya_feed_content['cruise_speed'], 'field_5a9371ee56d32', 'cruise_speed'),
-		array($cya_feed_content['cruise_max_speed'], 'field_5a9371f956d33', 'cruise_max_speed'),
-		array($cya_feed_content['price_from'], 'field_5a94e7c214579', 'price_from'),
-		array($cya_feed_content['price_to'], 'field_5a94e7dd1457a', 'price_to'),
-		array($cya_feed_content['boat_type'], 'field_5a97a01bb5b0b', 'boat_type'),
-		array($cya_feed_content['locations_added'], 'field_5a9b6eb892524', 'locations_added'),
-		array($cya_feed_content['dingy'], 'field_5a9ba95d49e5f', 'dingy'),
-		array($cya_feed_content['dingy_hp'], 'field_5a9ba990786d5', 'dingy_hp'),
-		array($cya_feed_content['paddle'], 'field_5a9ba95d49e73', 'paddle'),
-		array($cya_feed_content['single_kayak'], 'field_5a9ba9a4786d6', 'single_kayak'),
-		array($cya_feed_content['double_kayak'], 'field_5a9ba9c2786d7', 'double_kayak'),
-		array($cya_feed_content['adult_water_skis'], 'field_5a9ba9d2786d8', 'adult_water_skis'),
-		array($cya_feed_content['kid_water_skis'], 'field_5a9ba9dc786d9', 'kid_water_skis'),
-		array($cya_feed_content['wakeboard'], 'field_5a9ba9e6786da', 'wakeboard'),
-		array($cya_feed_content['kneeboard'], 'field_5a9ba9f3786db', 'kneeboard'),
-		array($cya_feed_content['wave_runner'], 'field_5a9baa01786dc', 'wave_runner'),
-		array($cya_feed_content['jet_skis'], 'field_5a9baa14786dd', 'jet_skis'),
-		array($cya_feed_content['snorkel'], 'field_5a9baa1f786de', 'snorkel'),
-		array($cya_feed_content['tube'], 'field_5a9baa2b786df', 'tube'),
-		array($cya_feed_content['fishing_gear'], 'field_5a9baa30786e0', 'fishing_gear'),
-		array($cya_feed_content['scuba_diving'], 'field_5aade0882f5bf', 'scuba_diving'),
-		array($cya_feed_content['air_compressor'], 'field_5aade0bd2f5c0', 'scuba_compressor'),
-	);
+	$meta_array = [
+		'acf_fields' => [
+			array($cya_feed_content['content'], 'field_5a69b88d45254', 'boat_description'),
+			array($cya_feed_content['guests'], 'field_5a9371571b4de', 'guests'),
+			array($cya_feed_content['staterooms'], 'field_5a93719456d2a', 'staterooms'),
+			array($cya_feed_content['length_feet'], 'field_5a9371a356d2b', 'length_feet'),
+			array($cya_feed_content['length_meters'], 'field_5a9371b556d2c', 'length_meters'),
+			array($cya_feed_content['beam'], 'field_5a9371bc56d2d', 'beam'),
+			array($cya_feed_content['draft'], 'field_5a9371c856d2e', 'draft'),
+			array($cya_feed_content['built'], 'field_5a9371d556d2f', 'built'),
+			array($cya_feed_content['refit'], 'field_5a9371d856d30', 'refit'),
+			array($cya_feed_content['builder'], 'field_5a9371e156d31', 'builder'),
+			array($cya_feed_content['cruise_speed'], 'field_5a9371ee56d32', 'cruise_speed'),
+			array($cya_feed_content['cruise_max_speed'], 'field_5a9371f956d33', 'cruise_max_speed'),
+			array($cya_feed_content['price_from'], 'field_5a94e7c214579', 'price_from'),
+			array($cya_feed_content['price_to'], 'field_5a94e7dd1457a', 'price_to'),
+			array($cya_feed_content['boat_type'], 'field_5a97a01bb5b0b', 'boat_type'),
+			array($cya_feed_content['dingy'], 'field_5a9ba95d49e5f', 'dingy'),
+			array($cya_feed_content['dingy_hp'], 'field_5a9ba990786d5', 'dingy_hp'),
+			array($cya_feed_content['paddle'], 'field_5a9ba95d49e73', 'paddle'),
+			array($cya_feed_content['single_kayak'], 'field_5a9ba9a4786d6', 'single_kayak'),
+			array($cya_feed_content['double_kayak'], 'field_5a9ba9c2786d7', 'double_kayak'),
+			array($cya_feed_content['adult_water_skis'], 'field_5a9ba9d2786d8', 'adult_water_skis'),
+			array($cya_feed_content['kid_water_skis'], 'field_5a9ba9dc786d9', 'kid_water_skis'),
+			array($cya_feed_content['wakeboard'], 'field_5a9ba9e6786da', 'wakeboard'),
+			array($cya_feed_content['kneeboard'], 'field_5a9ba9f3786db', 'kneeboard'),
+			array($cya_feed_content['wave_runner'], 'field_5a9baa01786dc', 'wave_runner'),
+			array($cya_feed_content['jet_skis'], 'field_5a9baa14786dd', 'jet_skis'),
+			array($cya_feed_content['snorkel'], 'field_5a9baa1f786de', 'snorkel'),
+			array($cya_feed_content['tube'], 'field_5a9baa2b786df', 'tube'),
+			array($cya_feed_content['fishing_gear'], 'field_5a9baa30786e0', 'fishing_gear'),
+			array($cya_feed_content['scuba_diving'], 'field_5aade0882f5bf', 'scuba_diving'),
+			array($cya_feed_content['air_compressor'], 'field_5aade0bd2f5c0', 'scuba_compressor')
+		],
+		'post_meta' => [
+			[$cya_feed_content['locations_added'], 'dp_metabox_ylocations', 'locations_added']
+		]
+	];
 
-	return $acf_fields;
+	return $meta_array;
 }
 
 
@@ -559,6 +597,27 @@ function cya_acf_fields($cya_feed_content = NULL, $yacht_id = NULL) {
 --------------------------------------------------------------*/
 function update_cya_acf_fields() {
 
+}
+
+/**
+ * Created: 4/8/2019
+ * Update ACF field or post meta
+ * @param meta: array with acf_fields or post_meta basically switching from acf vs wordpress meta
+ * @param post_id: post id passed
+ */
+function iyc_update_meta($meta_array, $post_id) {
+	foreach ($meta_array as $meta_type => $meta_type_array) {
+		foreach ($meta_type_array as $value_array) {
+			$value = $value_array[0];
+			$key = $value_array[1];
+
+			if ($meta_type === 'acf_fields') {
+				update_field($key, $value, $post_id);
+			} elseif ($meta_type === 'post_meta') {
+				update_post_meta($post_id, $key, $value);
+			}
+		}
+	}
 }
 
 function update_yacht_changes() {

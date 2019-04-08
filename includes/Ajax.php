@@ -16,11 +16,14 @@ class Ajax
 
     public function admin() 
     {
-        add_action('wp_ajax_form_start', [$this, 'form_start']);
-        add_action('wp_ajax_nopriv_form_start', [$this, 'form_start']);
         add_action('admin_enqueue_scripts', [$this, 'ajax_admin_enqueue_scripts']);
-        add_action('wp_ajax_admin_hook', [$this, 'ajax_admin_handler']);
-        add_action('wp_ajax_test_handler', [$this, 'test_handler']);
+
+        add_action('wp_ajax_form_start', [$this, 'search_results']);
+        add_action('wp_ajax_nopriv_form_start', [$this, 'search_results']);
+
+        add_action('wp_ajax_admin_hook', [$this, 'get_checked_boats']);
+
+        add_action('wp_ajax_test_handler', [$this, 'insert_checked_boat']);
     }
 
     public function public() 
@@ -31,7 +34,6 @@ class Ajax
     public function public_ajax_scripts() 
     {
         wp_enqueue_script('ajax-public-script', get_iyc_url() . '/resources/js/public/public.js');
-
         wp_localize_script('ajax-public-script', 'ajax_url', array( 
             'ajaxurl' => admin_url('admin-ajax.php'),
             'security' => wp_create_nonce('IYC_YACHTS_FETCH')
@@ -61,10 +63,10 @@ class Ajax
 
     }
 
-    public function test_handler() {
+    public function insert_checked_boat() {
 
         // check nonce
-        check_ajax_referer( 'ajax_admin', 'nonce' );
+        check_ajax_referer('ajax_admin', 'nonce');
 
         // check user
         if ( ! current_user_can( 'moderate_comments' ) ) return;
@@ -157,21 +159,14 @@ class Ajax
                 //get fields
                 $acf_fields = cya_acf_fields($cya_feed_content);
 
-                //Update acf fields
-                foreach ($acf_fields as $acf_array) {
-                    $content = $acf_array[0];
-                    $field_key = $acf_array[1];
-
-                    //update_field($selector, $value, $post_id);
-                    update_field( $field_key, $content, $post_id );
-                }
+                iyc_update_meta($acf_fields, $post_id);
             } 	
         }
         wp_die();
     }
 
     // process ajax request
-    public function ajax_admin_handler() {
+    public function get_checked_boats() {
 
         // check nonce
         check_ajax_referer( 'ajax_admin', 'nonce' );
@@ -222,7 +217,7 @@ class Ajax
         wp_die();
     }
 
-    public function form_start() {
+    public function search_results() {
         check_ajax_referer('IYC_YACHTS_FETCH', 'security');
     
         $price_arr = get_yacht_price($_POST['price']);
@@ -236,10 +231,9 @@ class Ajax
         }
     
         $meta_query = [];
-        $locations = set_locations();
     
         $boat_meta = [
-            'locations' => $locations[$_POST['ylocations']],
+            'dp_metabox_ylocations' => $_POST['ylocations'],
             'boat_type' => $_POST['boatType'], 
             'staterooms' => $_POST['staterooms'], 
             'guests' => $_POST['guests'],
@@ -268,23 +262,32 @@ class Ajax
              * For now handles the price_from/length_from logic
              */
             if (is_array($value)) {
-                $meta_query[] = [
+                $meta_query[$variable] = [
                     'key'     => $variable,
                     'value'   => [$value['from'], $value['to']],
                     'compare' => 'BETWEEN',
                     'type'    => 'numeric',
                 ];
+            } elseif ($variable === 'dp_metabox_ylocations') {
+                $meta_query[$variable] = [
+                    'key' => $variable,
+                    'value' => serialize($value),
+                    'compare' => 'LIKE'
+                ];
             } else {
-                $meta_query[] = [
+                $meta_query[$variable] = [
                     'key'     => $variable,
                     'value'   => $value,
                 ];
             }
         }
-    
+
         $args = array(
             'post_type'  => 'yacht_feed',
-            'meta_query' => $meta_query
+            'meta_query' => $meta_query,
+            'meta_key' => 'price_from',
+            'orderby' => 'meta_value_num',
+            'order' => 'ASC' 
         );
     
         $posts = Timber::get_posts($args);

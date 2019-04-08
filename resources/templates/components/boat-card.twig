@@ -2,7 +2,7 @@
     <div class="danzerpress-box" style="line-height: inherit; padding: 0px;">
         <div style="overflow:hidden; line-height: 0px;"><a href="{{ link }}"><img style="height: 100%;max-height: 200px;object-fit: cover;width: 100%;" src="{{ thumbnail.src }}"></a></div>
         <table class="yacht-specs danzerpress-box danzerpress-white danzerpress-shadow-3" style="margin:0px;">
-            <tr><td style="">Name</td><td style="color:black;font-weight:700;">{{ title|uppercase }}</td></tr>
+            <tr><td style="">Name</td><td style="color:black;font-weight:700;">{{ title|ucwords }}</td></tr>
             <tr><td>Price From</td><td> ${{ price_from|number_format }} - ${{ price_to|number_format }}</td></tr>
             <tr><td>Guests</td><td>{{ guests }}</td></tr>
             <tr><td>Staterooms</td><td>{{ staterooms }}</td></tr>

@@ -2,6 +2,7 @@
 namespace IYC;
 
 use Timber\Timber;
+use IYC\assets\Assets;
 
 class IYC 
 {
@@ -21,7 +22,6 @@ class IYC
         // include plugin dependencies: admin only
         if ( is_admin() ) {
             $this->admin();
-            add_action('admin_enqueue_scripts', [$this, 'load_custom_wp_admin_style']);
         }
 
         $this->public();
@@ -29,18 +29,20 @@ class IYC
         add_action('plugins_loaded', [templates\PageTemplater::class, 'get_instance']);
     }
 
-    public function admin() 
+    public function admin()
     {
+        add_action('admin_enqueue_scripts', [$this, 'load_custom_wp_admin_style']);
         require_once get_iyc_dir() . 'includes/admin-menu.php';
         
         new Settings;
-        //new IYC\WPCron;
+        //new WPCron;
     }
 
-    public function public() 
+    public function public()
     {
         new templates\WPHierarchy;
         new Twig;
+        new Assets;
         
         require_once get_iyc_dir() . 'includes/filters.php';
         require_once ABSPATH . 'wp-admin/includes/media.php';

@@ -1,7 +1,5 @@
 jQuery(document).ready(function($) {
-
 	$('#ylocations').change(function(event) {
-
 
 		// define value
 		var ylocations = $(this).val();
@@ -78,20 +76,17 @@ jQuery(document).ready(function($) {
 				action: 'test_handler', 
 				array: arrNumber 
 			},
-		}).error( 
-                function() {
-					$('.danzerpress-save').addClass('danzerpress-error');
-                    $('.danzerpress-save').html('<p>An Error Occurred</p>').show().fadeIn();
-                	$('.danzerpress-save').delay(3000).fadeOut();
-                }).success( function() {
-                	$('.danzerpress-save').html('<p>Changes Saved!</p>').show().fadeIn();
-                	$('.danzerpress-save').delay(3000).fadeOut();
+		}).error(function() {
+			$('.danzerpress-save').addClass('danzerpress-error');
+			$('.danzerpress-save').html('<p>An Error Occurred</p>').show().fadeIn();
+			$('.danzerpress-save').delay(3000).fadeOut();
+		}).success(function() {
+			$('.danzerpress-save').html('<p>Changes Saved!</p>').show().fadeIn();
+			$('.danzerpress-save').delay(3000).fadeOut();
+		});
 
-                });
-                $("input#submit").removeAttr("disabled");
-                return false;
-
+		$("input#submit").removeAttr("disabled");
+		return false;
 	});
-
 });
 

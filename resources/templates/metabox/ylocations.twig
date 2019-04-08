@@ -1,0 +1,7 @@
+{% for destination_code, destination in destinations %}
+    <label class="dp-label-container" style="display:block; margin-bottom:5px;" for="{{ meta_id }}[{{ destination_code }}]">{{ destination|capitalize }}
+        <input class="dp-checkmark" type="checkbox" name="{{ meta_id }}[{{ destination_code }}]" {{ (destination_code in metabox_data) ? 'checked' : '' }}>
+    </label>
+{% endfor %}
+
+{{ nonce_field }}

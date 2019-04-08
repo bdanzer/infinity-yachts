@@ -103,7 +103,7 @@ class Component
          */
         foreach ($this->default_values() as $key => $value) {
             if (method_exists($class, $key) || property_exists($class, $key)) {
-                $class = new $class($class->ID);
+                $class->$key();
                 $this->context[$key] = $class->$key();
             }
         }

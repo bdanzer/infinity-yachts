@@ -12,11 +12,11 @@ class Twig
     {
         /* this is where you can add your own functions to twig */
         $twig->addExtension(new \Twig_Extension_StringLoader());
-        $twig->addFilter(new \Twig_SimpleFilter('uppercase', [$this, 'uppercase']));
+        $twig->addFilter(new \Twig_SimpleFilter('ucwords', [$this, 'ucwords']));
         return $twig;
     }
 
-    public function uppercase($text) 
+    public function ucwords($text) 
     {
         return ucwords($text);
     }

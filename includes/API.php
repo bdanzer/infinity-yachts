@@ -5,7 +5,7 @@ final class API
 {
     private static $user_id = '128';
     private static $domain = 'infinityyachts.com';
-    private static  $apicode = '128Sx%$yerO9s3';
+    private static $apicode = '128Sx%$yerO9s3';
 
     public function __construct() {}
 
@@ -62,22 +62,22 @@ final class API
         return 'https://www.centralyachtagent.com/snapins/carates-xml.php?idin='. $yacht_id . '&user=' . self::$user_id;
     }
 
-    public static function get_xml_locations_array() 
+    public static function get_xml_locations() 
     {
-        return self::xml_array(self::get_xml_locations_url());
+        return self::xml_array(self::get_xml_locations_url())['locations'];
     }
 
-    public static function get_xml_snyachts_array($yacht_id = NULL, $query_data = NULL) 
+    public static function get_xml_snyachts($yacht_id = NULL, $query_data = NULL) 
     {
         return self::xml_array(self::get_xml_snyachts_url($yacht_id, $query_data));
     }
 
-    public static function get_xml_ebrochure_array($yacht_id = NULL) 
+    public static function get_xml_ebrochure($yacht_id = NULL) 
     {
         return self::xml_array(self::get_xml_ebrochure_url($yacht_id));
     }
 
-    public static function get_xml_carates_array($yacht_id = NULL) 
+    public static function get_xml_carates($yacht_id = NULL) 
     {
         return self::xml_array(self::get_xml_carates_url($yacht_id));
     }

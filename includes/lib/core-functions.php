@@ -320,27 +320,27 @@ function get_location_codes($summer_locations, $winter_locations) {
 }
 
 /*Get locations*/
-function get_locations($summer_locations, $winter_locations) {
-	var_dump(get_location_codes($summer_locations, $winter_locations));
-	die;
+// function get_locations($summer_locations, $winter_locations) {
+// 	var_dump(get_location_codes($summer_locations, $winter_locations));
+// 	die;
 
-	$locations_summer = strtolower((string)$summer_locations);
-	$locations_winter = strtolower((string)$winter_locations);
+// 	$locations_summer = strtolower((string)$summer_locations);
+// 	$locations_winter = strtolower((string)$winter_locations);
 
-	$locations = array_unique(array_merge(explode(", ",$locations_summer), explode(", ",$locations_winter)));
+// 	$locations = array_unique(array_merge(explode(", ",$locations_summer), explode(", ",$locations_winter)));
 
-	$locations_to_add = array();
+// 	$locations_to_add = array();
 
-	foreach ($locations as $location) {
-		$location = trim($location);
+// 	foreach ($locations as $location) {
+// 		$location = trim($location);
 
-		if (array_search($location, $specific_locations, true) !== false && !in_array($location, $locations_to_add)) {
-			$locations_to_add[] = $location;
-		}
-	}
+// 		if (array_search($location, $specific_locations, true) !== false && !in_array($location, $locations_to_add)) {
+// 			$locations_to_add[] = $location;
+// 		}
+// 	}
 
-	return $locations_added = implode(", ", $locations_to_add);
-}
+// 	return $locations_added = implode(", ", $locations_to_add);
+// }
 
 
 
@@ -600,8 +600,11 @@ function update_cya_acf_fields() {
 }
 
 /**
+ * Loop through and Update all ACF fields or post meta
+ * 
  * Created: 4/8/2019
- * Update ACF field or post meta
+ * Updated: TBA
+ * 
  * @param meta: array with acf_fields or post_meta basically switching from acf vs wordpress meta
  * @param post_id: post id passed
  */
@@ -620,17 +623,18 @@ function iyc_update_meta($meta_array, $post_id) {
 	}
 }
 
-function update_yacht_changes() {
-	$yacht_changes = array(
-		'yacht_id' => '',
-		'content_old' => '',
-		'content_new' => '',
-	);
-
-	return $yacht_changes;
-}
-
-/*Check for similarties of new vs old content*/
+/**
+ * Check for similarties of new vs old content
+ * 
+ * created: 2/20/2018
+ * updated: TBA
+ * 
+ * @param string  $content_new new content
+ * @param string  $content_old old content
+ * @param int	  $field_id    acf field id
+ * @param int 	  $post_id 	   post id
+ * @param WP_Post $my_post	   WordPress post object
+ **/
 function check_similarities($content_new, $content_old, $field_id = null, $post_id = null, $my_post = null) {
 	$content_stripped_1 = strip_tags(trim((string)$content_new));
 	$content_stripped_1 = preg_replace('/\s+/', '', $content_stripped_1);
@@ -644,7 +648,11 @@ function check_similarities($content_new, $content_old, $field_id = null, $post_
 
 		if ($field_id !== FALSE) {
 			
-			$update_yacht = update_yacht_changes();
+			$update_yacht = [
+				'yacht_id' => '',
+				'content_old' => '',
+				'content_new' => '',
+			];
 
 			$update_yacht['yacht_id'] = $post_id;
 			$update_yacht['content_old'] = $content_old;

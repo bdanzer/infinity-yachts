@@ -93,7 +93,7 @@ function get_post_id_from_yacht_id($yacht_id = null) {
  * created: 4/8/2019
  * updated: TBA
  * 
- * @param $form_post $_POST data
+ * @param $form_post $_POST data or array
  * 	'price'
  * 	'yachtLen
  * 	'ylocations'

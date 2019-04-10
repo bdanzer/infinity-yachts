@@ -70,16 +70,18 @@ dp_add_metabox($args, $context);
  * Handles data sanatization for the meta box.
  * 
  * created: April 8, 2019
- * updated: TBD
+ * updated: April 10, 2019
  *
  * @param array   $data    $_POST array
  * @param int     $post_id Post ID.
  * @param WP_Post $post    Post object.
  * @return data   $data
  */
-add_filter('sanatize_metabox_ylocations', function($data, $post_id, $post) {
+function sanitize_ylocations($data, $post_id, $post) {
+    $locations = [];
+
     foreach($data as $key => $value) {
         $locations[] = sanitize_text_field($key);
     }
     return $locations;
-}, 10, 3);
+}

@@ -13,6 +13,7 @@ class Metabox
     protected $priority;
     protected $callback_args;
     protected $context;
+    protected $sanitize_callback;
  
     /**
      * Constructor.
@@ -31,13 +32,14 @@ class Metabox
     
             $args = wp_parse_args($args, $defaults);
             
-            $this->id            = $args['id'];
-            $this->title         = $args['title'];
-            $this->screen        = $args['screen'];
-            $this->display       = $args['display'];
-            $this->priority      = $args['priority'];
-            $this->callback_args = $args['callback_args'];
-            $this->context       = $context;
+            $this->id                = $args['id'];
+            $this->title             = $args['title'];
+            $this->screen            = $args['screen'];
+            $this->display           = $args['display'];
+            $this->priority          = $args['priority'];
+            $this->callback_args     = $args['callback_args'];
+            $this->context           = $context;
+            $this->sanitize_callback = 'sanitize_' . $args['id'];
 
             add_action( 'load-post.php',     array( $this, 'init_metabox' ) );
             add_action( 'load-post-new.php', array( $this, 'init_metabox' ) );
@@ -80,7 +82,6 @@ class Metabox
             $this->priority,
             $this->callback_args
         );
- 
     }
  
     /**
@@ -105,10 +106,8 @@ class Metabox
      * @param WP_Post $post    Post object.
      * @return null
      */
-    public function save_metabox( $post_id, $post ) 
+    public function save_metabox($post_id, $post) 
     {
-        // Add nonce for security and authentication.
-        $data = apply_filters("sanatize_metabox_{$this->id}", isset($_POST[$this->id]) ? $_POST[$this->id] : '', $post_id, $post);
         $nonce_name   = isset($_POST['custom_nonce']) ? $_POST['custom_nonce'] : '';
         $nonce_action = 'custom_nonce_action';
  
@@ -130,6 +129,26 @@ class Metabox
         // Check if not a revision.
         if ( wp_is_post_revision( $post_id ) ) {
             return;
+        }
+
+         /**
+         * Let's return if we don't have the data
+         */
+        if (!isset($_POST[$this->id]) && !$_POST[$this->id])
+            return;
+
+        $data = $_POST[$this->id];
+
+        if (function_exists($this->sanitize_callback)) {
+            $args = [
+                $data,
+                $post_id,
+                $post
+            ];
+
+            $data = call_user_func_array($this->sanitize_callback, $args);
+        } else {
+            $data = $_POST;
         }
 
         update_post_meta($post_id, "dp_metabox_{$this->id}", $data);

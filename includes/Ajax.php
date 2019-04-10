@@ -112,10 +112,7 @@ class Ajax
             $is_checked = strpos($strvalue, 'unchecked');
 
             //removing the unchecked identifer to single out number
-            $yacht_id = str_replace('unchecked', '', $is_checked);
-
-            //converting string into number to avoid potential errors
-            $yacht_id = intval($value);
+            $yacht_id = intval(str_replace('unchecked', '', $is_checked));
 
             if ($is_checked !== false) {
                 //we need to find the id if is_checked not false
@@ -145,7 +142,7 @@ class Ajax
                 //Set post settings for creation
                 $post_arr = array(
                     'post_type' => 'yacht_feed',
-                    'post_title'   => (string)ucfirst(strtolower($cya_feed_content['name'])),
+                    'post_title'   => (string)ucwords(strtolower($cya_feed_content['name'])),
                     'post_content' => $yacht_id,
                     'post_status'  => 'publish',
                     'post_author'  => get_current_user_id(),

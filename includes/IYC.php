@@ -3,6 +3,7 @@ namespace IYC;
 
 use Timber\Timber;
 use IYC\assets\Assets;
+use IYC\boot\Bootstrap;
 
 class IYC 
 {

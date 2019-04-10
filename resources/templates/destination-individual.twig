@@ -24,7 +24,9 @@
                         
                     <h2 style="margin-bottom: 20px;">Yachts Available in {{ post.title|capitalize }}</h2>
                     <div class="danzerpress-flex-row danzerpress-row-fix">
-                        {{ boats }}
+                        {% for boat in boats %}
+                            {{ component.Boat({'post': boat}) }}
+                        {% endfor %}
                     </div>
                 </div>
 

@@ -3,12 +3,6 @@
 /*--------------------------------------------------------------
 ##General Functions
 --------------------------------------------------------------*/
-function build_sorter($key) {
-	return function ($a, $b) use ($key) {
-	    return strnatcmp($b[$key], $a[$key]);
-	};
-}
-
 function keep_breaks($value) {
     return nl2br(str_replace(' ', '&nbsp;', $value));
 }
@@ -45,6 +39,139 @@ function yacht_feed_search($sql, $wp_query) {
 		$sql = "AND `post_title` LIKE '%{$yacht_name}%'" . $sql;
 	}
 	return $sql;
+}
+
+/**
+ * Helps get yacht id
+ * 
+ * created: 4/9/2019
+ * updated: TBA
+ * 
+ * @param int $post_id Post ID
+ * 
+ * @return int $post_meta Yacht ID
+ */
+function get_yacht_id($post_id = null) {
+	if (!$post_id) {
+		$post_id = (get_the_ID()) ?: null;
+	}
+
+	return intval(get_post_meta($post_id, 'yacht_id', true));
+}
+
+/**
+ * Helps get post id from postmeta table
+ * 
+ * created: 4/9/2019
+ * updated: TBA
+ * 
+ * @param int $yacht_id Yacht ID
+ * 
+ * @return int $post_id Post ID
+ */
+function get_post_id_from_yacht_id($yacht_id = null) {
+	global $wpdb;
+	$sql = "SELECT `post_id` FROM `wp_postmeta`
+		WHERE `meta_key` = 'yacht_id' 
+		AND `meta_value` = %d
+	";
+
+	$query = $wpdb->prepare($sql, $yacht_id);
+
+	$post_id = $wpdb->get_col($query);
+
+	if (empty($post_id)) {
+		return false;
+	}
+
+	return intval($post_id[0]);
+}
+
+/**
+ * Helps get yacht meta for searches from $_POST
+ * 
+ * created: 4/8/2019
+ * updated: TBA
+ * 
+ * @param $form_post $_POST data
+ * 	'price'
+ * 	'yachtLen
+ * 	'ylocations'
+ * 	'boatType'
+ * 	'staterooms'
+ * 	'guests'
+ * 
+ * @return $meta_query WP_Query meta_query arg
+ */
+function yacht_meta_query($form_post = null) {
+		
+	$defaults = [
+		'ylocations' => null,
+		'boatType' => null, 
+		'staterooms' => null, 
+		'guests' => null,
+		'price' => 0,
+		'yachtLen' => 0
+	];
+
+	$form_post = wp_parse_args($form_post, $defaults);
+
+	$price_arr = get_yacht_price($form_post['price']);
+	$length_arr = get_yacht_length($form_post['yachtLen']);
+
+	$boat_meta = [
+		'dp_metabox_ylocations' => sanitize_text_field($form_post['ylocations']),
+		'boat_type' => sanitize_text_field($form_post['boatType']), 
+		'staterooms' => intval($form_post['staterooms']), 
+		'guests' => intval($form_post['guests']),
+		'price_from' => [
+			'from' => $price_arr['price_from'],
+			'to' => $price_arr['price_to']
+		],
+		'length_feet' => [
+			'from' => $length_arr['length_from'],
+			'to' => $length_arr['length_to']
+		]
+	];
+
+	$meta_query = [];
+
+	/**
+	 * Setting up meta_query
+	 * Not the cleanest but seems most DRY
+	 */
+	foreach ($boat_meta as $variable => $value) {
+		if (isset($value['to']) && $value['to'] === 'all' || $value === 'all')
+			continue;
+		
+		if (empty($value))
+			continue;
+
+		/**
+		 * For now handles the price_from/length_from logic
+		 */
+		if (is_array($value)) {
+			$meta_query[$variable] = [
+				'key'     => $variable,
+				'value'   => [$value['from'], $value['to']],
+				'compare' => 'BETWEEN',
+				'type'    => 'numeric',
+			];
+		} elseif ($variable === 'dp_metabox_ylocations') {
+			$meta_query[$variable] = [
+				'key' => $variable,
+				'value' => serialize($value),
+				'compare' => 'LIKE'
+			];
+		} else {
+			$meta_query[$variable] = [
+				'key'     => $variable,
+				'value'   => $value,
+			];
+		}
+	}
+
+	return $meta_query;
 }
 
 function get_yacht_price($case) {
@@ -289,8 +416,18 @@ function create_location_pages($array = null) {
 	}
 }
 
+function get_cya_locations() {
+	global $cya_locations;
+	return $cya_locations;
+}
+
+function get_formatted_shitty_cya_feed_locations() {
+	global $formatted_shitty_cya_feed_locations;
+	return $formatted_shitty_cya_feed_locations;
+}
+
 function format_shitty_cya_feed_locations() {
-	global $locations;
+	$locations = get_cya_locations();
 
 	$not_shitty_locations_array = [];
 
@@ -302,11 +439,11 @@ function format_shitty_cya_feed_locations() {
 }
 
 /*Get locations*/
-function get_location_codes($summer_locations, $winter_locations) {
-	global $formatted_shitty_cya_feed_locations;
+function get_location_codes($summer_locations, $winter_locations = []) {
+	$formatted_shitty_cya_feed_locations = get_formatted_shitty_cya_feed_locations();
 
-	$summer_locations = apply_filters('iyc_summer_locations', explode(", ", $summer_locations));
-	$winter_locations = apply_filters('iyc_winter_locations', explode(", ", $winter_locations));
+	$summer_locations = apply_filters('iyc_summer_locations', explode(", ", strtolower($summer_locations)));
+	$winter_locations = apply_filters('iyc_winter_locations', explode(", ", strtolower($winter_locations)));
 
 	$winter_locations = [];
 
@@ -319,126 +456,11 @@ function get_location_codes($summer_locations, $winter_locations) {
 	return apply_filters('iyc_location_codes', $location_codes);
 }
 
-/*Get locations*/
-// function get_locations($summer_locations, $winter_locations) {
-// 	var_dump(get_location_codes($summer_locations, $winter_locations));
-// 	die;
-
-// 	$locations_summer = strtolower((string)$summer_locations);
-// 	$locations_winter = strtolower((string)$winter_locations);
-
-// 	$locations = array_unique(array_merge(explode(", ",$locations_summer), explode(", ",$locations_winter)));
-
-// 	$locations_to_add = array();
-
-// 	foreach ($locations as $location) {
-// 		$location = trim($location);
-
-// 		if (array_search($location, $specific_locations, true) !== false && !in_array($location, $locations_to_add)) {
-// 			$locations_to_add[] = $location;
-// 		}
-// 	}
-
-// 	return $locations_added = implode(", ", $locations_to_add);
-// }
-
 
 
 /*--------------------------------------------------------------
 ##Yacht Specifics
 --------------------------------------------------------------*/
-//Must use within the custom post type loop yacht_feed or where you can get the current boat ID
-function create_boat_array() {
-	$args = array( 'post_type' => 'yacht_feed', 'posts_per_page' => 999 );
-	$loop = new WP_Query( $args );
-	while ( $loop->have_posts() ) : $loop->the_post();
-
-		$yacht_id = get_the_ID();
-		$yacht_title = get_the_title();
-		$yacht_type = get_field('boat_type', $yacht_id);
-		$staterooms = get_field('staterooms', $yacht_id);
-
-		if (get_field('price_from', $yacht_id) && !get_field('price_from_iyc', $yacht_id)) {
-			$yacht_pricef = (int)get_field('price_from', $yacht_id);
-		} else {
-			$yacht_pricef = get_field('price_from_iyc', $yacht_id);
-		}
-
-		if (get_field('price_to', $yacht_id) && !get_field('price_to_iyc', $yacht_id)) {
-			$yacht_pricet = (int)get_field('price_to', $yacht_id);
-		} else {
-			$yacht_pricet = get_field('price_to_iyc', $yacht_id);
-		}
-		
-		$yacht_guests = get_field('guests', $yacht_id);
-		$yacht_length = (int)str_replace('ft', '', strtolower((string)get_field('length_feet', $yacht_id)));
-		$yacht_locations = get_field('locations', $yacht_id);
-		$yacht_url = get_the_permalink();
-
-		if (get_the_post_thumbnail_url()) {
-			$yacht_image = get_the_post_thumbnail_url();
-		} else {
-			$yacht_image = danzerpress_no_image();
-		}
-
-		$yacht_boat = array(
-			'id' => $yacht_id,
-			'yacht_image' => $yacht_image,
-			'yacht_name' => strtolower($yacht_title),
-			'yacht_url' => $yacht_url,
-			'location' => $yacht_locations,
-			'boat_type' => strtolower($yacht_type),
-			'staterooms' => $staterooms,
-			'price_from' => $yacht_pricef,
-			'price_to' => $yacht_pricet,
-			'guests' => $yacht_guests,
-			'length' => $yacht_length,
-			'locations' => $yacht_locations,
-		);
-
-		
-		$yacht_boats[] = $yacht_boat;
-		
-	endwhile;
-
-	//reset post wp post data
-	wp_reset_postdata();
-
-	return $yacht_boats;
-}
-
-function create_boat($args) {
-	$defaults = [
-		'yacht_url' => '',
-		'yacht_name' => '',
-		'price_to' => '',
-		'price_from' => '',
-		'guests' => '',
-		'staterooms' => '',
-		'boat_type' => '',
-		'length' => '',
-		'yacht_image' => ''
-	];
-	$args = wp_parse_args($args, $defaults);
-
-	extract($args);
-
-	echo '<div class="danzerpress-col-2 wow fadeIn danzerpress-flex-column" style="margin-bottom: 20px;">';
-		echo '<div class="danzerpress-box" style="line-height: inherit; padding: 0px;">';
-			echo '<div style="overflow:hidden; line-height: 0px;"><a href="' . $yacht_url . '"><img style="height: 100%;max-height: 200px;object-fit: cover;width: 100%;" src="' . $yacht_image . '"></a></div>';
-			echo '<table class="yacht-specs danzerpress-box danzerpress-white danzerpress-shadow-3" style="margin:0px;">';
-				echo '<tr><td style="">Name</td><td style="color:black;font-weight:700;">' . ucwords($yacht_name) . '</td></tr>';
-				echo '<tr><td>Price From</td><td> $' . number_format($price_from) . ' - $' . number_format($price_to) . '</td></tr>';
-				echo '<tr><td>Guests</td><td>' . $guests . '</td></tr>';
-				echo '<tr><td>Staterooms</td><td>' . $staterooms . '</td></tr>';
-				echo '<tr><td>Yacht Type</td><td>' . ucfirst($boat_type) . '</td></tr>';
-				echo '<tr><td>Yacht length</td><td>' . $length . ' ft</td></tr>';
-			echo '</table>';
-			echo '<a style="display:block;border-radius:0px;" class="danzerpress-button-modern" href="' . $yacht_url . '">View Yacht</a>';
-		echo '</div>';
-	echo '</div>';
-}
-
 function set_pricing_options() {
 	$pricing_options = array(
 		'0' => 'All',
@@ -595,9 +617,6 @@ function cya_acf_fields($cya_feed_content = NULL, $yacht_id = NULL) {
 /*--------------------------------------------------------------
 ##Check for updates
 --------------------------------------------------------------*/
-function update_cya_acf_fields() {
-
-}
 
 /**
  * Loop through and Update all ACF fields or post meta

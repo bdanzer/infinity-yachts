@@ -41,7 +41,8 @@ class Ajax
     }
 
     // enqueue scripts
-    public function ajax_admin_enqueue_scripts( $hook ) {
+    public function ajax_admin_enqueue_scripts( $hook ) 
+    {
 
         // check if our page
         if ( 'toplevel_page_danzerpress' !== $hook ) return;
@@ -63,8 +64,8 @@ class Ajax
 
     }
 
-    public function insert_checked_boat() {
-
+    public function insert_checked_boat() 
+    {
         // check nonce
         check_ajax_referer('ajax_admin', 'nonce');
 
@@ -100,7 +101,7 @@ class Ajax
         $merge = array_merge($option_value, $newOrder);
 
         //updating database manually for the form with correct values
-        update_option( 'danzerpress_options', $merge);
+        update_option('danzerpress_options', $merge);
 
         foreach ($jqueryArray as $value) {
 
@@ -111,21 +112,26 @@ class Ajax
             $is_checked = strpos($strvalue, 'unchecked');
 
             //removing the unchecked identifer to single out number
-            $post_id = str_replace('unchecked', '', $is_checked);
+            $yacht_id = str_replace('unchecked', '', $is_checked);
 
             //converting string into number to avoid potential errors
-            $post_id = (int)$value;
+            $yacht_id = intval($value);
 
-            if ( $is_checked !== false) {
+            if ($is_checked !== false) {
+                //we need to find the id if is_checked not false
+                $post_id = get_post_id_from_yacht_id($yacht_id);
+
+                if (!$post_id)
+                    continue;
                 
                 //find image to delete
-                $image_id = get_post_thumbnail_id( $post_id );
+                $image_id = get_post_thumbnail_id($post_id);
 
                 //delete media associated with post
                 wp_delete_attachment($image_id, true);
 
                 //delete post if is unchecked
-                wp_delete_post( $post_id );
+                wp_delete_post($post_id);
             }
             
             if ( get_post_status ( $value ) || $is_checked !== false ) {
@@ -133,28 +139,32 @@ class Ajax
             } elseif ( $is_checked === false ) {
                 //Create post if it does not exist
 
-
                 //Get boat content array
-                $cya_feed_content = cya_feed_content($post_id);
+                $cya_feed_content = cya_feed_content($yacht_id);
 
                 //Set post settings for creation
                 $post_arr = array(
-                    'import_id' => $post_id,
                     'post_type' => 'yacht_feed',
                     'post_title'   => (string)ucfirst(strtolower($cya_feed_content['name'])),
-                    'post_content' => $post_id,
+                    'post_content' => $yacht_id,
                     'post_status'  => 'publish',
                     'post_author'  => get_current_user_id(),
                 );
 
                 //Create post
-                wp_insert_post($post_arr);
+                $post_id = wp_insert_post($post_arr);
+
+                if (!$post_id) {
+                    continue;
+                }
+
+                update_post_meta($post_id, 'yacht_id', $yacht_id);
 
                 //Upload media url to wordpress
-                $return = media_sideload_image($cya_feed_content['image'], $post_id, $cya_feed_content['desc'], 'id');
+                $image_id = media_sideload_image($cya_feed_content['image'], $post_id, $cya_feed_content['desc'], 'id');
 
                 //Set the media url to the post
-                set_post_thumbnail($post_id, $return);
+                set_post_thumbnail($post_id, $image_id);
 
                 //get fields
                 $acf_fields = cya_acf_fields($cya_feed_content);
@@ -166,8 +176,8 @@ class Ajax
     }
 
     // process ajax request
-    public function get_checked_boats() {
-
+    public function get_checked_boats() 
+    {
         // check nonce
         check_ajax_referer( 'ajax_admin', 'nonce' );
 
@@ -217,11 +227,9 @@ class Ajax
         wp_die();
     }
 
-    public function search_results() {
+    public function search_results() 
+    {
         check_ajax_referer('IYC_YACHTS_FETCH', 'security');
-    
-        $price_arr = get_yacht_price($_POST['price']);
-        $length_arr = get_yacht_length($_POST['yachtLen']);
     
         /**
          * Let's filter for name if we get it
@@ -229,62 +237,10 @@ class Ajax
         if (isset($_POST['yachtName']) && !empty($_POST['yachtName'])) {
             add_filter('posts_where_request', 'yacht_feed_search', 10, 2);
         }
-    
-        $meta_query = [];
-    
-        $boat_meta = [
-            'dp_metabox_ylocations' => $_POST['ylocations'],
-            'boat_type' => $_POST['boatType'], 
-            'staterooms' => $_POST['staterooms'], 
-            'guests' => $_POST['guests'],
-            'price_from' => [
-                'from' => $price_arr['price_from'],
-                'to' => $price_arr['price_to']
-            ],
-            'length_feet' => [
-                'from' => $length_arr['length_from'],
-                'to' => $length_arr['length_to']
-            ]
-        ];
-    
-        /**
-         * Setting up meta_query
-         * Not the cleanest but seems most DRY
-         */
-        foreach ($boat_meta as $variable => $value) {
-            if ($value['to'] === 'all' || $value === 'all')
-                continue;
-            
-            if (empty($value))
-                continue;
-    
-            /**
-             * For now handles the price_from/length_from logic
-             */
-            if (is_array($value)) {
-                $meta_query[$variable] = [
-                    'key'     => $variable,
-                    'value'   => [$value['from'], $value['to']],
-                    'compare' => 'BETWEEN',
-                    'type'    => 'numeric',
-                ];
-            } elseif ($variable === 'dp_metabox_ylocations') {
-                $meta_query[$variable] = [
-                    'key' => $variable,
-                    'value' => serialize($value),
-                    'compare' => 'LIKE'
-                ];
-            } else {
-                $meta_query[$variable] = [
-                    'key'     => $variable,
-                    'value'   => $value,
-                ];
-            }
-        }
 
         $args = array(
             'post_type'  => 'yacht_feed',
-            'meta_query' => $meta_query,
+            'meta_query' => yacht_meta_query($_POST),
             'meta_key' => 'price_from',
             'orderby' => 'meta_value_num',
             'order' => 'ASC' 

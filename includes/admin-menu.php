@@ -36,6 +36,23 @@ function http_get_add_toplevel_menu() {
 			get_home_url() . '/wp-content/uploads/2018/01/danzerpressofficial-e1519213344817.png',
 			null
 		);
+
+		/**
+		 * Slug
+		 * page title
+		 * menu title
+		 * capability
+		 * menu slug
+		 * function
+		 */
+		add_submenu_page(
+			'danzerpress', 
+			'Location Manager', 
+			'Locations', 
+			'moderate_comments', 
+			'iyc_locations', 
+			[IYC\Settings::class, 'locations_settings']
+		);
 	}
 
 }

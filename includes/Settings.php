@@ -9,6 +9,11 @@ class Settings
         add_action('admin_notices', [$this, 'danzerpress_admin_notices']);
     }
 
+    public static function locations_settings() 
+    {
+        echo 'Hi';
+    }
+
     // display the plugin settings page
     public static function danzerpress_display_settings_page() {
 

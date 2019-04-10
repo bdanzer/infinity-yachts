@@ -9,7 +9,7 @@ Text Domain: IYC
 */
 
 /**
- * Define dir Constants
+ * Define Plugin Constants
  */
 define('IYC_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 define('IYC_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
@@ -25,12 +25,13 @@ new IYC\IYC;
  *  need to set custom locations that work with cya
  *  need to be able to remove cya locations
  */
-$locations = IYC\API::get_xml_locations();
+$cya_locations = IYC\API::get_xml_locations();
 $formatted_shitty_cya_feed_locations = format_shitty_cya_feed_locations();
 
 /**
  * Opened an issue regarding this: 
  * https://github.com/timber/timber/issues/1966
+ * This filter helps force first array value to be set in post_custom
  * 
  * created: April 6, 2019
  * updated: TBD
@@ -82,29 +83,3 @@ add_filter('sanatize_metabox_ylocations', function($data, $post_id, $post) {
     }
     return $locations;
 }, 10, 3);
-
-// add_action('init', function() {
-//     $args = [
-//         'post_type' => 'yacht_feed',
-//         'posts_per_page' => '-1'
-//     ];
-//     $query = new WP_Query($args);
-    
-//     $posts = $query->get_posts();
-
-//     $count = 0;
-//     foreach ($posts as $post) {
-//         $locations = get_field('locations', $post->ID);
-
-//         if (is_array($locations))
-//             continue;
-            
-//         $location_codes = get_location_codes($locations, 'null');
-//         update_post_meta($post->ID, 'dp_metabox_ylocations', $location_codes);
-
-//         $count++;
-//     }
-
-//     var_dump("Updated {$count} posts");
-//     die;
-// });

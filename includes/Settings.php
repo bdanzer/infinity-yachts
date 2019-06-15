@@ -82,6 +82,10 @@ class Settings
         exit;
     }
 
+    /**
+     * TODO: Should probably store in an option and set up a cron to check for updates to the destinaions 
+     * instead of the merging
+     */
     public static function locations_settings() 
     {
         $current_locations = YachtHelper::get_locations();
@@ -91,12 +95,6 @@ class Settings
         ];
 
         $checkboxes = Timber::compile('parts/check-boxes.twig', $context);
-
-        // if (isset($option_value['yachtid_' . $value['yachtId']])) {
-        //     $checked = checked($option_value['yachtid_' . $value['yachtId']],$value['yachtId'], false);
-        // } else {
-        //     $checked = '';
-        // }
         
         echo '<h2>Locations to add from feed</h2>';
         echo '<p>Locations selected here are what will be added to the site from cya feed</p>';

@@ -173,6 +173,9 @@ class Ajax
     }
 
     // process ajax request
+    /**
+     * TODO: could use timber render and clean up the response array for snyachts
+     */
     public function get_checked_boats() 
     {
         // check nonce
@@ -185,19 +188,18 @@ class Ajax
         $result = isset( $_POST['ylocations'] ) ? $_POST['ylocations'] : false;
 
         // get url response
-        //$response = get_xml_snapin_url() .'&ylocations=' . $result;
         $response = API::get_xml_snyachts(['ylocations' => $result]);
-
-        //$xml_snapins = simplexml_load_file($response);
-        // echo '<pre>';
-        // var_dump($xml_snapins->yacht);
-        // var_dump($response);
-        // echo '</pre>';
-        //die;
 
         if ( ! empty( $result ) ) {
 
-            foreach ($response['yacht'] as $value) {
+            if (!isset($response['yacht']['yachtId'])) {
+                $response = $response['yacht'];
+            }
+
+            foreach ($response as $value) {
+                if (!is_array($value)) {
+                    $value = $response['yacht'];
+                }
                 $option_value = get_option('danzerpress_options');
 
                 if (isset($option_value['yachtid_' . $value['yachtId']])) {

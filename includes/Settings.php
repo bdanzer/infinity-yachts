@@ -16,6 +16,13 @@ class Settings
 
     public function validate_locations_to_add_manually() 
     {
+        if ( ! isset( $_POST['locations_to_add_manually_nonce'] ) 
+        || ! wp_verify_nonce( $_POST['locations_to_add_manually_nonce'], 'iyc_adding_locations_manually' ) 
+        ) {
+            wp_die('Sorry, your nonce did not verify.');
+            exit;
+        }
+        
         $location_to_add_manually = sanitize_text_field($_POST['manual_location']['location_to_add_manually']);
 
         $current_locations = get_option('IYC_cya_locations');
@@ -32,6 +39,13 @@ class Settings
 
     public function validate_locations_to_add() 
     {
+        if ( ! isset( $_POST['locations_to_add_nonce'] ) 
+        || ! wp_verify_nonce( $_POST['locations_to_add_nonce'], 'iyc_adding_locations' ) 
+        ) {
+            wp_die('Sorry, your nonce did not verify.');
+            exit;
+        }
+
         $locations_to_add = [];
 
         foreach ($_POST['danzerpress_options'] as $location_key => $location) {
@@ -89,6 +103,7 @@ class Settings
         echo '<form method="POST" action="' . esc_url( admin_url('admin-post.php') ) . '">';
         echo $checkboxes;
         echo '<input type="hidden" name="action" value="locations_to_add">';
+        wp_nonce_field('iyc_adding_locations', 'locations_to_add_nonce');
         echo '<div style="clear: both;">';
         submit_button();
         echo '</div>';
@@ -98,6 +113,7 @@ class Settings
         echo '<form method="POST" action="' . esc_url( admin_url('admin-post.php') ) . '">';
         echo '<input type="text" name="manual_location[location_to_add_manually]" placeholder="enter locations here">';
         echo '<input type="hidden" name="action" value="locations_to_add_manually">';
+        wp_nonce_field('iyc_adding_locations_manually', 'locations_to_add_manually_nonce');
         submit_button();
         echo '</form>';
     }

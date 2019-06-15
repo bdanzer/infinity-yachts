@@ -185,30 +185,34 @@ class Ajax
         $result = isset( $_POST['ylocations'] ) ? $_POST['ylocations'] : false;
 
         // get url response
-        $response = get_xml_snapin_url() .'&ylocations=' . $result;
+        //$response = get_xml_snapin_url() .'&ylocations=' . $result;
+        $response = API::get_xml_snyachts(['ylocations' => $result]);
 
+        //$xml_snapins = simplexml_load_file($response);
+        // echo '<pre>';
+        // var_dump($xml_snapins->yacht);
+        // var_dump($response);
+        // echo '</pre>';
+        //die;
 
         if ( ! empty( $result ) ) {
 
-            $xml_snapins = simplexml_load_file($response);
-            $xml_object = $xml_snapins->yacht;
-
-            foreach ($xml_object as $value) {
+            foreach ($response['yacht'] as $value) {
                 $option_value = get_option('danzerpress_options');
 
-                if (isset($option_value['yachtid_' . $value->yachtId])) {
-                    $checked = checked($option_value['yachtid_' . $value->yachtId],$value->yachtId, false);
+                if (isset($option_value['yachtid_' . $value['yachtId']])) {
+                    $checked = checked($option_value['yachtid_' . $value['yachtId']],$value['yachtId'], false);
                 } else {
                     $checked = '';
                 }
 
                 echo '
                 <div class="yacht-wrap" style="width:25%; float:left;"> 
-                    <input type="hidden" value="0" name="danzerpress_options[yachtid_' . $value->yachtId . ']">
-                    <input id="' . $value->yachtId . '" name="danzerpress_options[yachtid_' . $value->yachtId . ']" type="checkbox" ' . $checked . ' value="' . $value->yachtId . '">
+                    <input type="hidden" value="0" name="danzerpress_options[yachtid_' . $value['yachtId'] . ']">
+                    <input id="' . $value['yachtId'] . '" name="danzerpress_options[yachtid_' . $value['yachtId'] . ']" type="checkbox" ' . $checked . ' value="' . $value['yachtId'] . '">
                     <div class="yacht-content">
-                        <h4 style="margin-bottom:0px;">' . $value->yachtName . '</h4>
-                        <p style="margin-top:0px;">Size: ' . $value->size . '</p>
+                        <h4 style="margin-bottom:0px;">' . $value['yachtName'] . '</h4>
+                        <p style="margin-top:0px;">Size: ' . $value['size'] . '</p>
                     </div>
                 </div>
                 ';

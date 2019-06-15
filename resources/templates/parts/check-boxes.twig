@@ -1,0 +1,10 @@
+{% for location_key, location in locations %}
+    <div class="yacht-wrap" style="width:25%; float:left;">
+        {# <input type="hidden" value="0" name="danzerpress_options[{{key}}]"> #}
+        <input id="" name="danzerpress_options[{{location_key}}]" type="checkbox" {{(current_locations[ location_key ] == location) ? 'checked' : '' }} value="{{location}}">
+        <div class="yacht-content">
+            <h4 style="margin-bottom:0px;">{{location|capitalize}}</h4>
+            <p style="margin-top:0px;">{{location_key}}</p>
+        </div>
+    </div>
+{% endfor %}

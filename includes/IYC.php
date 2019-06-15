@@ -80,8 +80,7 @@ class IYC
     }
 
     public function load_custom_wp_admin_style($hook) {
-        // Load only on ?page=mypluginname
-        if($hook != 'toplevel_page_danzerpress')
+        if($hook != 'toplevel_page_danzerpress' && $hook != 'cya-yachts_page_iyc_locations')
             return;
 
         wp_enqueue_style('custom_wp_admin_css', get_iyc_url() . '/resources/css/admin/danzerpress-admin.css');

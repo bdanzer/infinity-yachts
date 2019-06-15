@@ -1,14 +1,13 @@
 <?php
 namespace IYC\helpers;
 
+use IYC\API;
+
 class YachtHelper 
 {
-    public function __construct() 
-    {
+    public function __construct() {}
 
-    }
-
-    public function get_yacht_price($case) 
+    public static function get_yacht_price($case) 
     {
         $price_arr = [];
         
@@ -46,7 +45,7 @@ class YachtHelper
         return $price_arr;
     }
     
-    public function get_yacht_length($case) 
+    public static function get_yacht_length($case) 
     {
         $length_arr = [];
         switch ($case) {
@@ -95,66 +94,26 @@ class YachtHelper
         return $length_arr;
     }
 
-    public function get_locations() 
+    public static function get_locations() 
     {
-        $specific_locations = array(
-            'src13' => 'alaska',
-            'src28' => 'antarctica',
-            'src29' => 'arctic',
-            'src21' => 'australia',
-            'src5' => 'bahamas',
-            //IYC Location SRC50
-            'src50' => 'british colombia',
-            'src17' => 'california',
-            'src34' => 'canary islands',
-            'src7' => 'caribbean leewards',
-            'src3' => 'caribbean virgin islands',
-            'src8' => 'caribbean windwards',
-            'src20' => 'central america',
-            'src16' => 'croatia',
-            'src32' => 'cuba',
-            'src26' => 'dubai',
-            'src10' => 'florida',
-            'src30' => 'french polynesia',
-            'src31' => 'galapagos',
-            'src18' => 'great lakes',
-            'src4' => 'greece',
-            'src12' => 'indian ocean and se asia',
-            //IYC Location SRC50
-            'src51' => 'indonesia',
-            'src19' => 'mexico',
-            'src9' => 'new england',
-            'src22' => 'new zealand',
-            'src24' => 'northern europe',
-            'src14' => 'pacific nw',
-            'src25' => 'red sea',
-            'src2' => 'south america',
-            'src33' => 'south china sea',
-            'src23' => 'south pacific',
-            'src11' => 'turkey',
-            'src27' => 'united arab emirates',
-            'src15' => 'w. med - spain/balearics',
-            'src1' => 'w. med -naples/sicily',
-            'src6' => 'w. med -riviera/cors/sard.',
-        );
-    
-        return $specific_locations;
+        $locations = get_option('IYC_cya_locations');
+        return $locations;
     }
 
-    public function format_shitty_cya_feed_locations() 
+    public static function format_shitty_cya_feed_locations() 
     {
-        global $locations;
+        $locations = API::get_xml_locations();
     
         $not_shitty_locations_array = [];
     
         foreach ($locations as $location) {
             $not_shitty_locations_array[$location['locationCode']] = strtolower($location['locationName']);
         }
-    
+
         return $not_shitty_locations_array;
     }
 
-    public function get_location_codes($summer_locations, $winter_locations) 
+    public static function get_location_codes($summer_locations, $winter_locations) 
     {
         global $formatted_shitty_cya_feed_locations;
     
@@ -172,7 +131,7 @@ class YachtHelper
         return apply_filters('iyc_location_codes', $location_codes);
     }
 
-    public function get_pricing_options() 
+    public static function get_pricing_options() 
     {
         $pricing_options = array(
             '0' => 'All',
@@ -187,20 +146,20 @@ class YachtHelper
         return $pricing_options;
     }
     
-    public function get_boat_types() 
+    public static function get_boat_types()
     {
         $boat_types = array(
-            'all' => 'All Types',
+            'all'   => 'All Types',
             'power' => 'Power Yacht',
             'motor' => 'Motor Yacht',
-            'sail' => 'Sailing Yacht',
-            'cat' => 'Sailing Catamaran',
+            'sail'  => 'Sailing Yacht',
+            'cat'   => 'Sailing Catamaran',
         );
     
         return $boat_types;
     }
     
-    public function get_boat_lengths() 
+    public static function get_boat_lengths() 
     {
         $boat_lengths = array(
             '0' => 'All Lengths',

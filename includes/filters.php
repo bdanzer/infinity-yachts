@@ -4,13 +4,13 @@ add_filter('pre_render_context_destination-individual', 'destination_individual'
 function destination_individual($context) 
 {
     $current_page_id = get_the_ID();
-    $location_code = 'src' . $current_page_id;
+    $location_code = get_post_meta($current_page_id, 'IYC_destination_key', true);
 
     $args = [
         'post_type'  => 'yacht_feed',
         'meta_query' => yacht_meta_query([
-                'ylocations' => $location_code
-            ]),
+            'ylocations' => $location_code
+        ]),
         'meta_key' => 'price_from',
         'orderby' => 'meta_value_num',
         'order' => 'ASC' 

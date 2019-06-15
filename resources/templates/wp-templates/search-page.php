@@ -20,7 +20,7 @@
 										$ylocations = 1;
 									}
 
-									$locations = set_locations();
+									$locations = IYC\helpers\YachtHelper::get_locations();
 
 									if ($ylocations != 0 && isset($_POST['ylocations'])) {
 										echo '<span>(added location: ' . $locations[$ylocations] . ')</span>'; 
@@ -57,7 +57,7 @@
 							<label>Price Range
 								<select id="price" name="price" id="price">
 									<?php
-										$pricing_options = set_pricing_options();
+										$pricing_options = IYC\helpers\YachtHelper::get_pricing_options();
 										foreach ($pricing_options as $key => $option) {
 											echo '<option value="' . $key . '">' . $option . '</option>';
 										}
@@ -70,7 +70,7 @@
 							<label>Boat Type
 								<select name="type" id="type">
 									<?php
-										$boat_types = set_boat_types();
+										$boat_types = IYC\helpers\YachtHelper::get_boat_types();
 										foreach ($boat_types as $key => $boat_type) {
 											echo '<option value="' . $key . '">' . $boat_type . '</option>';
 										}
@@ -98,7 +98,7 @@
 							<label>Length (ft) </label>
 							<select name="len" id="len">
 								<?php
-									$boat_lengths = set_boat_lengths();
+									$boat_lengths = IYC\helpers\YachtHelper::get_boat_lengths();
 									foreach ($boat_lengths as $key => $boat_length) {	
 										echo '<option value="' . $key . '">' . $boat_length . '</option>';
 									}

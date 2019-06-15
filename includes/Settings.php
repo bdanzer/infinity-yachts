@@ -1,17 +1,105 @@
 <?php
 namespace IYC;
 
+use IYC\helpers\YachtHelper;
+use Timber;
+
 class Settings
 {
     public function __construct() 
     {
         add_action('admin_init', [$this, 'danzerpress_register_settings']);
         add_action('admin_notices', [$this, 'danzerpress_admin_notices']);
+        add_action('admin_post_locations_to_add', [$this, 'validate_locations_to_add']);
+        add_action('admin_post_locations_to_add_manually', [$this, 'validate_locations_to_add_manually']);
+    }
+
+    public function validate_locations_to_add_manually() 
+    {
+        $location_to_add_manually = sanitize_text_field($_POST['manual_location']['location_to_add_manually']);
+
+        $current_locations = get_option('IYC_cya_locations');
+
+        $number = count($current_locations) + 1;
+        $current_locations["iyc{$number}"] = $location_to_add_manually;
+
+        update_option('IYC_cya_locations', $current_locations);
+        create_location_page("iyc{$number}", $location_to_add_manually);
+
+        wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+        exit;
+    }
+
+    public function validate_locations_to_add() 
+    {
+        $locations_to_add = [];
+
+        foreach ($_POST['danzerpress_options'] as $location_key => $location) {
+            $locations_to_add[ sanitize_text_field($location_key) ] = sanitize_text_field($location);
+        }
+
+        $current_locations = get_option('IYC_cya_locations');
+        
+        $locations_removed = array_diff($current_locations, $locations_to_add);
+        $locations_added = array_diff($locations_to_add, $current_locations);
+
+        /**
+         * Remove location pages
+         */
+        if (!empty($locations_removed) && is_array($locations_removed)) {
+            foreach ($locations_removed as $location_key => $location) {
+                $post_id = get_post_id_from_dest_key($location_key);
+                
+                if (!empty($post_id)) {
+                    wp_delete_post($post_id, true);
+                }
+            }
+        }
+        
+        if (!empty($locations_added) && is_array($locations_added)) {
+            foreach ($locations_added as $location_key => $location) {
+                create_location_page($location_key, $location);
+            }
+        }
+
+        update_option('IYC_cya_locations', $locations_to_add);
+
+        wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
+        exit;
     }
 
     public static function locations_settings() 
     {
-        echo 'Hi';
+        $current_locations = YachtHelper::get_locations();
+        $context = [
+            'locations' => YachtHelper::format_shitty_cya_feed_locations() + $current_locations,
+            'current_locations' => $current_locations
+        ];
+
+        $checkboxes = Timber::compile('parts/check-boxes.twig', $context);
+
+        // if (isset($option_value['yachtid_' . $value['yachtId']])) {
+        //     $checked = checked($option_value['yachtid_' . $value['yachtId']],$value['yachtId'], false);
+        // } else {
+        //     $checked = '';
+        // }
+        
+        echo '<h2>Locations to add from feed</h2>';
+        echo '<p>Locations selected here are what will be added to the site from cya feed</p>';
+        echo '<form method="POST" action="' . esc_url( admin_url('admin-post.php') ) . '">';
+        echo $checkboxes;
+        echo '<input type="hidden" name="action" value="locations_to_add">';
+        echo '<div style="clear: both;">';
+        submit_button();
+        echo '</div>';
+        echo '</form>';
+
+        echo '<h2>Manually added locations</h2>';
+        echo '<form method="POST" action="' . esc_url( admin_url('admin-post.php') ) . '">';
+        echo '<input type="text" name="manual_location[location_to_add_manually]" placeholder="enter locations here">';
+        echo '<input type="hidden" name="action" value="locations_to_add_manually">';
+        submit_button();
+        echo '</form>';
     }
 
     // display the plugin settings page
@@ -157,54 +245,14 @@ class Settings
 
     // callback: feed section
     public function danzerpress_callback_section_feed() {
-        
+        $context = [
+            'locations' => YachtHelper::get_locations()
+        ];
+
         echo '<p>'. esc_html__('These settings enable you to customize the CYA feed.', 'danzerpress') .'</p>'; 
 
         echo '<div style="background:white;padding:20px;box-shadow:1px 1px 1px rgba(0, 0, 0, 0.050980392156862744);overflow:hidden;">';
-
-            echo '
-            <label>Yacht Locations
-            <select id="ylocations" name="ylocations" style="display:block;">
-                <option id="0" value="0">Select Location</option>
-                <option id="src13" value="src13">Alaska</option>
-                <option id="src28" value="src28">Antarctica</option>
-                <option id="src29" value="src29">Arctic</option>
-                <option id="src21" value="src21">Australia</option>
-                <option id="src5" value="src5">Bahamas</option>
-                <option id="src17" value="src17">California</option>
-                <option id="src34" value="src34">Canary Islands</option>
-                <option id="src7" value="src7">Caribbean Leewards</option>
-                <option id="src3" value="src3">Caribbean Virgin Islands</option>
-                <option id="src8" value="src8">Caribbean Windwards</option>
-                <option id="src20" value="src20">Central America</option>
-                <option id="src16" value="src16">Croatia</option>
-                <option id="src32" value="src32">Cuba</option>
-                <option id="src26" value="src26">Dubai</option>
-                <option id="src10" value="src10">Florida</option>
-                <option id="src30" value="src30">French Polynesia</option>
-                <option id="src31" value="src31">Galapagos</option>
-                <option id="src18" value="src18">Great Lakes</option>
-                <option id="src4" value="src4">Greece</option>
-                <option id="src12" value="src12">Indian Ocean and SE Asia</option>
-                <option id="src19" value="src19">Mexico</option>
-                <option id="src9" value="src9">New England</option>
-                <option id="src22" value="src22">New Zealand</option>
-                <option id="src24" value="src24">Northern Europe</option>
-                <option id="src14" value="src14">Pacific NW</option>
-                <option id="src25" value="src25">Red Sea</option>
-                <option id="src2" value="src2">South America</option>
-                <option id="src33" value="src33">South China Sea</option>
-                <option id="src23" value="src23">South Pacific</option>
-                <option id="src11" value="src11">Turkey</option>
-                <option id="src27" value="src27">United Arab Emirates</option>
-                <option id="src15" value="src15">W. Med - Spain/Balearics</option>
-                <option id="src1" value="src1">W. Med -Naples/Sicily</option>
-                <option id="src6" value="src6">W. Med -Riviera/Cors/Sard.</option>
-            </select>
-            </label>
-            ';
-
-
+            Timber::render('parts/ylocations.twig', $context);
             echo '<div class="ajax-response"></div>';
         
         echo '</div>';

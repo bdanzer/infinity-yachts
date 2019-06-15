@@ -5,7 +5,7 @@
 <?php 
 
 get_header(); 
-$locations = set_locations();
+$locations = IYC\helpers\YachtHelper::get_locations();
 
 ?>
 
@@ -15,10 +15,10 @@ $locations = set_locations();
 			<?php
 
 			foreach ($locations as $key => $location) {
-				$destination_page_id = (int)str_replace('src', '', $key);
-				$destination_page_url = get_post_permalink($destination_page_id);
-				$destination_page_thumbnail = get_the_post_thumbnail_url($destination_page_id);
-				$destination_page_title = get_the_title($destination_page_id);
+				$dest_post_id = get_post_id_from_dest_key($key);
+				$destination_page_url = get_post_permalink($dest_post_id);
+				$destination_page_thumbnail = get_the_post_thumbnail_url($dest_post_id);
+				$destination_page_title = get_the_title($dest_post_id);
 
 				if ($destination_page_thumbnail == '') {
 					$destination_page_thumbnail = danzerpress_no_image();

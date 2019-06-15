@@ -23,7 +23,7 @@ final class API
         return 'https://www.centralyachtagent.com/snapins/xmllocations2.php';
     }
 
-    public static function get_xml_snyachts_url($query_data = NULL) 
+    public static function get_xml_snyachts_url($query_data = []) 
     {
         $defaults = [
             'ylocations' => '', //can pass array of locations like src35=1, src36=1 for multiple
@@ -47,7 +47,7 @@ final class API
     public static function get_xml_ebrochure_url($yacht_id = NULL) 
     {
         if (!$yacht_id) {
-            $id = get_the_ID();
+            $yacht_id = get_the_ID();
         }
         
         return 'https://www.centralyachtagent.com/snapins/ebrochure-xml.php?user=' . self::$user_id . '&idin=' . $yacht_id . '&act=' . self::$domain . '&apicode=' . self::$apicode . '';
@@ -56,7 +56,7 @@ final class API
     public static function get_xml_carates_url($yacht_id = NULL) 
     {
         if (!$yacht_id) {
-            $id = get_the_ID();
+            $yacht_id = get_the_ID();
         }
 
         return 'https://www.centralyachtagent.com/snapins/carates-xml.php?idin='. $yacht_id . '&user=' . self::$user_id;
@@ -64,12 +64,20 @@ final class API
 
     public static function get_xml_locations() 
     {
-        return self::xml_array(self::get_xml_locations_url())['locations'];
+        if ($locations = get_transient('IYC_locations_transient')) {
+            return $locations;
+        }
+
+        $locations = self::xml_array(self::get_xml_locations_url())['locations'];
+
+        set_transient( 'IYC_locations_transient', $locations, 3600);
+
+        return $locations;
     }
 
-    public static function get_xml_snyachts($yacht_id = NULL, $query_data = NULL) 
+    public static function get_xml_snyachts($query_data = []) 
     {
-        return self::xml_array(self::get_xml_snyachts_url($yacht_id, $query_data));
+        return self::xml_array(self::get_xml_snyachts_url($query_data));
     }
 
     public static function get_xml_ebrochure($yacht_id = NULL) 
@@ -77,12 +85,12 @@ final class API
         return self::xml_array(self::get_xml_ebrochure_url($yacht_id));
     }
 
-    public static function get_xml_carates($yacht_id = NULL) 
+    public static function get_xml_carates($yacht_id = NULL)
     {
         return self::xml_array(self::get_xml_carates_url($yacht_id));
     }
     
-    public static function xml_array($url) 
+    public static function xml_array($url)
     {
         $xml = simplexml_load_file($url, 'SimpleXMLElement', LIBXML_NOCDATA);
         $xml_array = json_decode(json_encode((array) $xml), true);

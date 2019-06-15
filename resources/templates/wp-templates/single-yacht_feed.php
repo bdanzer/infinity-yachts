@@ -50,7 +50,12 @@
 						//Boat Gallery (feed)
 						echo '<h4 class="yacht-title">Gallery</h4>';
 						//Solution from stackoverflow
-						$xml_ebrochure_array = xml_json_decode();
+						$xml_ebrochure_array = IYC\API::get_xml_ebrochure()['yacht'];
+
+						// echo '<pre>';
+						// var_dump($xml_ebrochure_array);
+						// echo '</pre>';
+						// die;
 
 						//dp_clean($xml_ebrochure_array);
 						
@@ -115,8 +120,6 @@
 									<?php
 										foreach ($xml_ebrochure_array as $key => $value) {
 											if((strpos($key, $name) !== FALSE && strpos($key, $name_large) !== FALSE && $value != '')) {
-												
-												$value = str_replace('http', 'https', $value);
 												$yacht_pic_large[$key] = $value;
 												$large_pic = $value;
 
@@ -142,8 +145,6 @@
 									<?php
 										foreach ($xml_ebrochure_array as $key => $value) {
 											if((strpos($key, $name) !== FALSE && strpos($key, $name_large) !== FALSE && $value != '')) {
-												
-												$value = str_replace('http', 'https', $value);
 												$yacht_pic_large[$key] = $value;
 												$large_pic = $value;
 
@@ -229,7 +230,7 @@
 						echo '</div>';
 
 						if ( isset($xml_ebrochure_array['yachtLayout']) && $xml_ebrochure_array['yachtLayout'] != '') {
-							$yacht_layout_xml = str_replace('http', 'https', $xml_ebrochure_array['yachtLayout']);
+							$yacht_layout_xml = $xml_ebrochure_array['yachtLayout'];
 							echo '<h4 class="yacht-title">Layout</h4>';
 							//Boat Layout picture (feed)
 							//Boat Layout Description (don't need feed but will put it since they can edit it)
@@ -396,11 +397,10 @@
 								$crew_photo = get_field('crew_photo');
 							} else {
 								$crew_photo = $xml_ebrochure_array['yachtCrewPhoto'];
-								$crew_photo = str_replace('http', 'https', $crew_photo);
 							}
 
 							if ($crew_photo != '' && !is_array($crew_photo)) {
-								echo '<img src="' . $crew_photo . '">';
+								echo '<img src="' . $crew_photo . '"><br>';
 							}
 
 							echo $crew_profile;
@@ -412,14 +412,14 @@
 						echo '<h4 class="yacht-title">Destinations / Sample Itenaries</h4>';
 							echo '<div class="danzerpress-flex-row">';
 
-								$locations = set_locations();
+								$locations = IYC\helpers\YachtHelper::get_locations();
 								get_post_permalink();
 
-								$yacht_locations = explode(', ', get_field('locations'));
+								$yacht_locations = get_post_meta(get_the_ID(), 'dp_metabox_ylocations', true);
 							    $location_codes = array();
 
-							    foreach ($yacht_locations as $yacht_location) {
-							    	$destination_page_id = (int)str_replace('src', '', array_search($yacht_location, $locations));
+							    foreach ($yacht_locations as $yacht_key) {
+							    	$destination_page_id = get_post_id_from_dest_key($yacht_key);
 							    	$destination_page_url = get_post_permalink($destination_page_id);
 							    	$destination_page_thumbnail = get_the_post_thumbnail_url($destination_page_id);
 							    	$destination_page_title = get_the_title($destination_page_id);

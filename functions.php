@@ -17,16 +17,34 @@ define('IYC_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 require_once IYC_PLUGIN_DIR . '/vendor/autoload.php';
 require_once IYC_PLUGIN_DIR . 'includes/lib/core-functions.php';
 
+/**
+ * Init Plugin
+ */
 new IYC\IYC;
 
 /**
- * TODO:
- *  set locations on plugin activation in database from CYA feed
- *  need to set custom locations that work with cya
- *  need to be able to remove cya locations
+ * Tester function to get all sorted yacht ids from cya feed
+ * 
+ * created: June 15, 2019
+ * updated: TBD
+ * 
+ * @return array $yacht_ids Yacht Ids dumped on to page after die statement
  */
-$cya_locations = IYC\API::get_xml_locations();
-$formatted_shitty_cya_feed_locations = format_shitty_cya_feed_locations();
+function find_all_cya_feed_yacht_ids() {
+    $snap = IYC\API::get_xml_snyachts();
+
+    $yacht_ids = [];
+    foreach($snap as $yacht) {
+        foreach($yacht as $key => $value) {
+            $yacht_ids[] = (int)$value['yachtId'];
+        }
+    }
+
+    sort($yacht_ids);
+
+    var_dump($yacht_ids);
+    die;
+}
 
 /**
  * Opened an issue regarding this: 
@@ -61,7 +79,7 @@ $args = [
 ];
 
 $context = [
-    'destinations' => set_locations()
+    'destinations' => IYC\helpers\YachtHelper::get_locations()
 ];
 
 dp_add_metabox($args, $context);

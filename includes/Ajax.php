@@ -256,12 +256,8 @@ class Ajax
          * so we don't cause any other filters to run
          */
         remove_filter('posts_where_request', 'yacht_feed_search');
-    
-        if (empty($posts)) {
-            $template = 'parts/no-yachts.twig';
-        } else {
-            $template = 'parts/boat-collection.twig';
-        }
+
+        $template = (empty($posts)) ? 'parts/no-yachts.twig' : 'parts/boat-collection.twig';
     
         $context = get_context() + [
             'posts' => $posts

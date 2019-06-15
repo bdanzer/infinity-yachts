@@ -286,7 +286,6 @@ class Settings
         }
 
         $input = array_merge($old_data, $input);
-        //var_dump($input);
 
         return $input;
 

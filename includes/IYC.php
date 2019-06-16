@@ -36,7 +36,7 @@ class IYC
         require_once get_iyc_dir() . 'includes/admin-menu.php';
         
         new Settings;
-        //new WPCron;
+        new WPCron;
     }
 
     public function public()

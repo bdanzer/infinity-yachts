@@ -114,8 +114,8 @@ class YachtHelper
     }
 
     public static function get_location_codes($summer_locations, $winter_locations) 
-    {
-        global $formatted_shitty_cya_feed_locations;
+    {   
+        $formatted_shitty_cya_feed_locations = self::format_shitty_cya_feed_locations();
     
         $summer_locations = apply_filters('iyc_summer_locations', explode(", ", $summer_locations));
         $winter_locations = apply_filters('iyc_winter_locations', explode(", ", $winter_locations));
@@ -123,9 +123,9 @@ class YachtHelper
         $winter_locations = [];
     
         $locations = apply_filters('iyc_locations', array_unique(array_merge($summer_locations, $winter_locations)));
-    
+
         foreach ($locations as $location) {
-            $location_codes[] = array_search($location, $formatted_shitty_cya_feed_locations);
+            $location_codes[] = array_search(strtolower($location), $formatted_shitty_cya_feed_locations);
         }
     
         return apply_filters('iyc_location_codes', $location_codes);

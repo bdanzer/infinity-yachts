@@ -112,11 +112,12 @@ class Ajax
             $is_checked = strpos($strvalue, 'unchecked');
 
             //removing the unchecked identifer to single out number
-            $yacht_id = intval(str_replace('unchecked', '', $is_checked));
+            $yacht_id = intval((int)str_replace('unchecked', '', $strvalue));
+
+            //we need to find the id if is_checked not false
+            $post_id = get_post_id_from_yacht_id($yacht_id);
 
             if ($is_checked !== false) {
-                //we need to find the id if is_checked not false
-                $post_id = get_post_id_from_yacht_id($yacht_id);
 
                 if (!$post_id)
                     continue;
@@ -131,7 +132,7 @@ class Ajax
                 wp_delete_post($post_id);
             }
             
-            if ( get_post_status ( $value ) || $is_checked !== false ) {
+            if ( get_post_status ( $post_id ) || $is_checked !== false ) {
                 //Do nothing if it's a post already
             } elseif ( $is_checked === false ) {
                 //Create post if it does not exist
@@ -157,9 +158,13 @@ class Ajax
 
                 update_post_meta($post_id, 'yacht_id', $yacht_id);
 
+                if (empty($cya_feed_content['desc'])) {
+                    $cya_feed_content['desc'] = $cya_feed_content['name'];
+                }
+
                 //Upload media url to wordpress
                 $image_id = media_sideload_image($cya_feed_content['image'], $post_id, $cya_feed_content['desc'], 'id');
-
+                
                 //Set the media url to the post
                 set_post_thumbnail($post_id, $image_id);
 
@@ -248,6 +253,9 @@ class Ajax
             'orderby' => 'meta_value_num',
             'order' => 'ASC' 
         );
+
+        // var_dump($args);
+        // die;
     
         $posts = Timber::get_posts($args);
     

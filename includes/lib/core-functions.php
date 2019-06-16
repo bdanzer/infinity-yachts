@@ -210,6 +210,9 @@ function yacht_meta_query($form_post = null) {
 		}
 	}
 
+	// var_dump($meta_query);
+	// die;
+
 	return $meta_query;
 }
 
@@ -219,10 +222,16 @@ function yacht_meta_query($form_post = null) {
 --------------------------------------------------------------*/
 
 /**
- * TODO: Should not be basing post on src{$num}
- * Should change to using post meta like the yacht ids
+ * Helps create location pages
+ * 
+ * created: 6/15/2019
+ * updated: TBA
+ * 
+ * @param  string $location_key Location Key
+ * @param  string $post_title   Post Title
+ * 
+ * @return int    $new_page_id  New post id created 
  */
-//add_action( 'admin_init', 'create_location_pages' );
 function create_location_page($location_key, $post_title) {
 	$post_id = get_post_id_from_dest_key($location_key);
 
@@ -257,7 +266,7 @@ function create_location_page($location_key, $post_title) {
 --------------------------------------------------------------*/
 function cya_feed_content($yacht_id) {
 	//Convert to XML Object
-	$xml_ebrochure = IYC\API::get_xml_ebrochure($yacht_id);
+	$xml_ebrochure = IYC\API::get_xml_ebrochure($yacht_id)['yacht'];
 
 	if (strpos($xml_ebrochure['yachtLowPrice'], '&#36;') !== FALSE) {
 		$currency = '&#36;';
@@ -307,6 +316,9 @@ function cya_feed_content($yacht_id) {
 		'air_compressor' => $xml_ebrochure['yachtCompressor'], 
 	);
 
+	// var_dump($cya_feed_content);
+	// die;
+
 	return $cya_feed_content;
 }
 
@@ -330,7 +342,7 @@ function cya_acf_fields($cya_feed_content = NULL, $yacht_id = NULL) {
 			array($cya_feed_content['builder'], 'field_5a9371e156d31', 'builder'),
 			array($cya_feed_content['cruise_speed'], 'field_5a9371ee56d32', 'cruise_speed'),
 			array($cya_feed_content['cruise_max_speed'], 'field_5a9371f956d33', 'cruise_max_speed'),
-			array($cya_feed_content['price_from'], 'field_5a94e7c214579', 'price_from'),
+			array($cya_feed_content['price_from'], 'field_5d058cdde1500', 'price_from'),
 			array($cya_feed_content['price_to'], 'field_5a94e7dd1457a', 'price_to'),
 			array($cya_feed_content['boat_type'], 'field_5a97a01bb5b0b', 'boat_type'),
 			array($cya_feed_content['dingy'], 'field_5a9ba95d49e5f', 'dingy'),
@@ -446,7 +458,6 @@ function check_similarities($content_new, $content_old, $field_id = null, $post_
 /*Check for xml updates from the feed*/
 function check_for_xml_updates() {
 	//get all yacht url
-	//$xml = get_xml_snapin_url();
 	$xml = IYC\API::get_xml_snyachts_url();
 
 	//convert into simple object
@@ -455,34 +466,51 @@ function check_for_xml_updates() {
 	//get current boats in database
 	$option_value = get_option('danzerpress_options');
 
+	$test_arr = [];
+
 	//Loop through each boat form xml snapins
 	foreach ($xml_snapins as $value) {
+		//Set yacht_id
+		$yacht_id = (int)$value->yachtId;
 
-		$post_id = (int)$value->yachtId;
+		$post_id = get_post_id_from_yacht_id($yacht_id);
 
 		//Check if boat from feed exists in database
-		if(in_array($value->yachtId, $option_value) && get_post_status($post_id) != 'trash' && (int)get_field('overide_cya', $post_id) != 1) {
-
-			//Set yacht_id
-			$yacht_id = (int)$value->yachtId;
+		if(false !== $post_id && in_array($value->yachtId, $option_value) && get_post_status($post_id) != 'trash' && (int)get_field('overide_cya', $post_id) != 1) {
 
 			//get cya feed content
 			$cya_feed_content = cya_feed_content($yacht_id);
 
 			//Set post array
 			$post_arr = array(
-				'ID' => $yacht_id,
+				'ID' => $post_id,
 			    'post_title'   => $cya_feed_content['name'],
 			);
 
+			if ($post_id) {
+				// Update the post into the database
+				wp_update_post( $post_arr );
+			}
+
 			//get image id
-			$image_id = get_post_thumbnail_id($yacht_id);
+			$image_id = get_post_thumbnail_id($post_id);
 
 			//delete current image
 			wp_delete_attachment($image_id, true);
 
+			if (empty($cya_feed_content['desc']) || is_array($cya_feed_content['desc'])) {
+				$cya_feed_content['desc'] = $cya_feed_content['name'];
+			}
+
 			//upload new image
 			$media_id = media_sideload_image($cya_feed_content['image'], $yacht_id, $cya_feed_content['desc'], 'id');
+
+			$test_arr[$yacht_id] = [
+				'yacht_id' => $yacht_id,
+				'post_id' => $post_id,
+				'media_id' => $media_id,
+				'cya_feed_content' => $cya_feed_content
+			];
 
 			//set new picture to post
 			set_post_thumbnail($yacht_id, $media_id);
@@ -491,20 +519,8 @@ function check_for_xml_updates() {
 			$acf_fields = cya_acf_fields($cya_feed_content);
 
 			//Update acf fields
-			foreach ($acf_fields as $acf_array) {
-			    $content = $acf_array[0];
-			    $field_key = $acf_array[1];
-			    $field_name = $acf_array[2];
+			iyc_update_meta($acf_fields, $post_id);
 
-				//check_similarities($content_new, $content_old, $field_id = null, $post_id = null, $my_post = null)
-				check_similarities($content, get_field($field_name, $yacht_id), $field_key, $yacht_id);
-			}	
-
-		} else {
-			if ( get_post_status ( $post_id ) ) {
-				
-			}
 		}
 	}
-
 }

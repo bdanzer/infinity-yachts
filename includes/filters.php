@@ -23,5 +23,8 @@ function destination_individual($context)
         'boats' => Timber::get_posts($args)
     ];
 
+    var_dump($args);
+    die;
+    
     return $context;
 }

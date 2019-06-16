@@ -412,11 +412,7 @@
 						echo '<h4 class="yacht-title">Destinations / Sample Itenaries</h4>';
 							echo '<div class="danzerpress-flex-row">';
 
-								$locations = IYC\helpers\YachtHelper::get_locations();
-								get_post_permalink();
-
 								$yacht_locations = get_post_meta(get_the_ID(), 'dp_metabox_ylocations', true);
-							    $location_codes = array();
 
 							    foreach ($yacht_locations as $yacht_key) {
 							    	$destination_page_id = get_post_id_from_dest_key($yacht_key);

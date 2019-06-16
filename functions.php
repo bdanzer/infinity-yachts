@@ -13,6 +13,7 @@ Text Domain: IYC
  */
 define('IYC_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 define('IYC_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
+define('ALTERNATE_WP_CRON', true);
 
 require_once IYC_PLUGIN_DIR . '/vendor/autoload.php';
 require_once IYC_PLUGIN_DIR . 'includes/lib/core-functions.php';
@@ -42,7 +43,23 @@ function find_all_cya_feed_yacht_ids() {
 
     sort($yacht_ids);
 
-    var_dump($yacht_ids);
+    return $yacht_ids;
+}
+
+/**
+ * Tester function to get all sorted yacht ids from cya feed
+ * 
+ * created: June 15, 2019
+ * updated: TBD
+ * 
+ * @param int    $yacht_id
+ * 
+ * @return array $yacht_data Yacht data passed from cya feed
+ */
+function find_yacht_in_cya_feed($yacht_id) {
+    echo '<pre>';
+    var_dump(IYC\API::get_xml_ebrochure($yacht_id));
+    echo '</pre>';
     die;
 }
 

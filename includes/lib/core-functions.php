@@ -513,7 +513,7 @@ function check_for_xml_updates() {
 			];
 
 			//set new picture to post
-			set_post_thumbnail($yacht_id, $media_id);
+			set_post_thumbnail($post_id, $media_id);
 
 			//get fields
 			$acf_fields = cya_acf_fields($cya_feed_content);

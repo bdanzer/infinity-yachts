@@ -111,7 +111,7 @@
 				</div>
 			</div>
 
-			<div class="danzerpress-two-thirds">
+			<div class="yacht-boats-container danzerpress-two-thirds danzerpress-row-fix">
 				<!-- <select style="max-width: 400px;display: block; text-align: right;margin-bottom: 20px;">
 					<option>Filters</option>
 					<option>Sort by Price High</option>

@@ -21,7 +21,8 @@ jQuery(document).ready(function($)
 			data.action = 'load_more';
 			data.paged = $('#load-more-boats').data('paged');
 
-			console.log(data.paged);
+			$('#load-more-boats').hide();
+			$('.iyc-spinner').show();
 
 			jQuery.ajax({
 				type: 'POST',
@@ -29,9 +30,12 @@ jQuery(document).ready(function($)
 				data: data,
 			}).error(function() {
 				alert('error');
+				$('.iyc-spinner').hide();
 			}).success(function(data) {
+				$('.iyc-spinner').hide();
 				$('#load-more-boats').before(data);	
 				$('#load-more-boats').data('paged', $('#load-more-boats').data('paged') + 1);
+				$('#load-more-boats').show();
 			});
 		}
 		

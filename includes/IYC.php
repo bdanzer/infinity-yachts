@@ -51,7 +51,8 @@ class IYC
         require_once ABSPATH . 'wp-admin/includes/image.php';
     }
 
-    public function yacht_setup_post_type() {
+    public function yacht_setup_post_type() 
+    {
         $args = array(
             'public'    => true,
             'label'     => __( 'Yacht Feed', 'textdomain' ),
@@ -65,7 +66,8 @@ class IYC
         register_post_type( 'yacht_feed', $args );
     }
     
-    public function review_setup_post_type() {
+    public function review_setup_post_type() 
+    {
         $args = array(
             'public'    => true,
             'label'     => __( 'Reviews', 'textdomain' ),
@@ -79,7 +81,8 @@ class IYC
         register_post_type( 'review_feed', $args );
     }
 
-    public function load_custom_wp_admin_style($hook) {
+    public function load_custom_wp_admin_style($hook) 
+    {
         if($hook != 'toplevel_page_danzerpress' && $hook != 'cya-yachts_page_iyc_locations')
             return;
 

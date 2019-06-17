@@ -13,7 +13,6 @@ Text Domain: IYC
  */
 define('IYC_PLUGIN_URL', plugin_dir_url( __FILE__ ));
 define('IYC_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
-define('ALTERNATE_WP_CRON', true);
 
 require_once IYC_PLUGIN_DIR . '/vendor/autoload.php';
 require_once IYC_PLUGIN_DIR . 'includes/lib/core-functions.php';

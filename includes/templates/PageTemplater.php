@@ -145,7 +145,7 @@ class PageTemplater
 		if ( file_exists( $file ) ) {
 			return $file;
 		} else {
-			echo $file;
+			//echo $file;
 		}
 
 		// Return template

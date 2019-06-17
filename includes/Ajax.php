@@ -21,9 +21,42 @@ class Ajax
         add_action('wp_ajax_form_start', [$this, 'search_results']);
         add_action('wp_ajax_nopriv_form_start', [$this, 'search_results']);
 
+        add_action('wp_ajax_load_more', [$this, 'load_more_boats']);
+        add_action('wp_ajax_nopriv_load_more', [$this, 'load_more_boats']);
+
         add_action('wp_ajax_admin_hook', [$this, 'get_checked_boats']);
 
         add_action('wp_ajax_test_handler', [$this, 'insert_checked_boat']);
+    }
+
+    public function load_more_boats() 
+    {
+        check_ajax_referer('IYC_YACHTS_FETCH', 'security');
+
+        $args = array(
+            'post_type'  => 'yacht_feed',
+            'meta_query' => yacht_meta_query($_POST),
+            'meta_key' => 'price_from',
+            'orderby' => 'meta_value_num',
+            'order' => 'ASC',
+            'paged' => intval($_POST['paged']),
+            'posts_per_page' => 10
+        );
+
+        // var_dump($args);
+        // die;
+    
+        $posts = Timber::get_posts($args);
+    
+        $template = (empty($posts)) ? 'parts/no-yachts.twig' : 'parts/boat-collection.twig';
+    
+        $context = get_context() + [
+            'posts' => $posts
+        ];
+    
+        Timber::render($template, $context);
+        
+        wp_die();
     }
 
     public function public() 
@@ -251,11 +284,10 @@ class Ajax
             'meta_query' => yacht_meta_query($_POST),
             'meta_key' => 'price_from',
             'orderby' => 'meta_value_num',
-            'order' => 'ASC' 
+            'order' => 'ASC',
+            'posts_per_page' => 10,
+            'paged' => 1
         );
-
-        // var_dump($args);
-        // die;
     
         $posts = Timber::get_posts($args);
     
@@ -268,7 +300,8 @@ class Ajax
         $template = (empty($posts)) ? 'parts/no-yachts.twig' : 'parts/boat-collection.twig';
     
         $context = get_context() + [
-            'posts' => $posts
+            'posts' => $posts,
+            'loadmore' => true
         ];
     
         Timber::render($template, $context);

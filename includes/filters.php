@@ -22,9 +22,6 @@ function destination_individual($context)
         'sidebar' => Timber::compile('parts/content-sidebar.twig'),
         'boats' => Timber::get_posts($args)
     ];
-
-    var_dump($args);
-    die;
     
     return $context;
 }

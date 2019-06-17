@@ -1,3 +1,7 @@
 {% for post in posts %}
     {{ component.Boat({post: post}) }}
 {% endfor %}
+
+{% if loadmore %}
+    <a id="load-more-boats" class="danzerpress-button-modern" data-paged="2" style="width: 100%;" href="">Load More Boats</a>
+{% endif %}

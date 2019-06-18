@@ -120,8 +120,6 @@ class YachtHelper
         $summer_locations = apply_filters('iyc_summer_locations', explode(", ", $summer_locations));
         $winter_locations = apply_filters('iyc_winter_locations', explode(", ", $winter_locations));
     
-        $winter_locations = [];
-    
         $locations = apply_filters('iyc_locations', array_unique(array_merge($summer_locations, $winter_locations)));
 
         foreach ($locations as $location) {

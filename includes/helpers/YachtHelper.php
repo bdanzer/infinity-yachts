@@ -96,7 +96,7 @@ class YachtHelper
 
     public static function get_locations() 
     {
-        $locations = get_option('IYC_cya_locations');
+        $locations = (get_option('IYC_cya_locations')) ?: [];
         return $locations;
     }
 

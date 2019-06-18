@@ -30,7 +30,7 @@ class Settings
         $number = count($current_locations) + 1;
         $current_locations["iyc{$number}"] = $location_to_add_manually;
 
-        update_option('IYC_cya_locations', $current_locations);
+        $this->update_cya_locations($current_locations);
         create_location_page("iyc{$number}", $location_to_add_manually);
 
         wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
@@ -76,10 +76,17 @@ class Settings
             }
         }
 
-        update_option('IYC_cya_locations', $locations_to_add);
+        $this->update_cya_locations($locations_to_add);
 
         wp_redirect( $_SERVER["HTTP_REFERER"], 302, 'WordPress' );
         exit;
+    }
+
+    public function update_cya_locations($locations_data) 
+    {
+        
+        asort($locations_data);
+        update_option('IYC_cya_locations', $locations_data);
     }
 
     /**
@@ -89,8 +96,12 @@ class Settings
     public static function locations_settings() 
     {
         $current_locations = YachtHelper::get_locations();
+        $locations = YachtHelper::format_shitty_cya_feed_locations() + $current_locations;
+        
+        asort($locations);
+       
         $context = [
-            'locations' => YachtHelper::format_shitty_cya_feed_locations() + $current_locations,
+            'locations' => $locations,
             'current_locations' => $current_locations
         ];
 

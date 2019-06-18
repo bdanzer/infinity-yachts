@@ -2,7 +2,9 @@
     <select class="" id="ylocations" name="ylocations" style="display: block;">
         <option id="all-locations" value="0">All Locations</option>
         {% for location_key, location in locations %}
-            <option id="{{location_key}}" value="{{location_key}}">{{fn('ucwords', location)}}</option>
+            {% if 'src' in location_key %}
+                <option id="{{location_key}}" value="{{location_key}}">{{fn('ucwords', location)}}</option>
+            {% endif %}
         {% endfor %}
     </select>
 </label>

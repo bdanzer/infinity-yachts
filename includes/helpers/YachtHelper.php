@@ -116,10 +116,10 @@ class YachtHelper
     public static function get_location_codes($summer_locations, $winter_locations) 
     {   
         $formatted_shitty_cya_feed_locations = self::format_shitty_cya_feed_locations();
-    
-        $summer_locations = apply_filters('iyc_summer_locations', explode(", ", $summer_locations));
-        $winter_locations = apply_filters('iyc_winter_locations', explode(", ", $winter_locations));
-    
+
+        $summer_locations = (empty($summer_locations)) ? [] : apply_filters('iyc_summer_locations', explode(", ", $summer_locations));
+        $winter_locations = (empty($winter_locations)) ? [] : apply_filters('iyc_winter_locations', explode(", ", $winter_locations));
+
         $locations = apply_filters('iyc_locations', array_unique(array_merge($summer_locations, $winter_locations)));
 
         foreach ($locations as $location) {

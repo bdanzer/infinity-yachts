@@ -27,7 +27,6 @@
 							    'controls'    => 1,
 							    'hd'        => 1,
 								'autohide'    => 1,
-								'autoplay' => 1
 							);
 
 							$new_src = add_query_arg($params, $src);

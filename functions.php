@@ -113,7 +113,7 @@ dp_add_metabox($args, $context);
  * Handles data sanatization for the meta box.
  * 
  * created: April 8, 2019
- * updated: April 10, 2019
+ * updated: June 29, 2019
  *
  * @param array   $data    $_POST array
  * @param int     $post_id Post ID.
@@ -124,7 +124,7 @@ function sanitize_ylocations($data, $post_id, $post) {
     $locations = [];
 
     foreach($data as $key => $value) {
-        $locations[] = sanitize_text_field($key);
+        $locations[sanitize_text_field($key)] = sanitize_text_field($value);
     }
     return $locations;
 }

@@ -16,13 +16,13 @@
                         {% endfor %}
                     </div>
 
-                    <h2>About {{ post.title|capitalize }}</h2>
+                    <h2>About {{ post.title|ucwords }}</h2>
                         <div class="">
                             {{ post.content }}
                         </div>
                     <br>
                         
-                    <h2 style="margin-bottom: 20px;">Yachts Available in {{ post.title|capitalize }}</h2>
+                    <h2 style="margin-bottom: 20px;">Yachts Available in {{ post.title|ucwords }}</h2>
                     <div class="danzerpress-flex-row danzerpress-row-fix">
                         {% for boat in boats %}
                             {{ component.Boat({'post': boat}) }}

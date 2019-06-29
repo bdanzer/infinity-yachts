@@ -25,3 +25,21 @@ function destination_individual($context)
     
     return $context;
 }
+
+add_filter('pre_render_context_single-yacht_feed', 'yacht_individual');
+function yacht_individual($context) 
+{
+    $yacht_individual = new IYC\contexts\YachtIndividual($context);
+    return $yacht_individual->context();
+}
+
+add_filter('pre_render_context_destinations-page', 'destinations_page');
+function destinations_page($context) 
+{
+    $context = $context + [
+        'yacht_locations' => IYC\helpers\YachtHelper::get_locations(),
+        'iyc' => new IYC\contexts\IYC_Context
+    ];
+    
+    return $context;
+}

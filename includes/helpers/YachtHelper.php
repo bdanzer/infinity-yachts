@@ -123,7 +123,8 @@ class YachtHelper
         $locations = apply_filters('iyc_locations', array_unique(array_merge($summer_locations, $winter_locations)));
 
         foreach ($locations as $location) {
-            $location_codes[] = array_search(strtolower($location), $formatted_shitty_cya_feed_locations);
+            $location_code = array_search(strtolower($location), $formatted_shitty_cya_feed_locations);
+            $location_codes[$location_code] = $location;
         }
     
         return apply_filters('iyc_location_codes', $location_codes);

@@ -1,0 +1,168 @@
+{{ fn('get_header') }}
+	<div id="primary" class="danzerpress-container-fw danzerpress-grey" style="padding: 40px 0;">
+		<main id="main" class="danzerpress-wrap">
+			<div class="danzerpress-flex-row danzerpress-row-fix">
+				<div class="danzerpress-two-thirds">
+					<div class="" style="">
+						{{video}}
+
+						{% if images %}
+							<h4 class="yacht-title">Gallery</h4>
+							{% include 'parts/slider.twig' %}
+						{% endif %}
+
+						{% if boat_description %}
+							<h4 class="yacht-title">Description</h4>
+							<div class="yacht-section wow fadeIn danzerpress-shadow-3 danzerpress-box danzerpress-white">
+							    <p>{{boat_description}}</p>
+							</div>
+						{% endif %}
+
+						<h4 class="yacht-title">Specifications</h4>
+						<div class="yacht-section wow fadeIn danzerpress-shadow-3 danzerpress-box danzerpress-white">
+							<table>
+                                {% if post.meta('guests') %}
+                                    <tr><td>Guests</td> <td>{{post.meta('guests')}}</td></tr>
+                                {% endif %}
+                                
+								{% if post.meta('staterooms') %}
+									<tr><td>Staterooms</td><td>{{post.meta('staterooms')}}</td></tr>
+							    {% endif %}
+
+                                {% if post.meta('length_feet') or post.meta('length_meters') %}
+									<tr><td>Length</td><td>{{post.meta('length_feet') ~ ' / ' ~ post.meta('length_meters')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('beam') %}
+									<tr><td>Beam</td><td>{{post.meta('beam') ~ ' ' ~ unit}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('draft') %}
+									<tr><td>Draft</td><td>{{post.meta('draft') ~ ' ' ~ unit}}</td></tr>
+								{% endif %}
+
+                                {% if post.meta('built') or post.meta('refit') %}
+									<tr><td>Built - Refit:</td><td>{{post.meta('built') ~ ' - ' ~ post.meta('refit')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('builder') %}
+									<tr><td>Builder</td><td>{{post.meta('builder')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('cruise_speed') %}
+									<tr><td>Cruise Speed</td><td>{{post.meta('cruise_speed')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('cruise_max_speed') %}
+									<tr><td>Maximum Speed</td><td>{{post.meta('cruise_max_speed')}}</td></tr>
+                                {% endif %}
+							</table>
+						</div>
+
+                        {% if yacht_layout %}
+                            <h4 class="yacht-title">Layout</h4>
+                            <div class="danzerpress-image-wrap" style="display:inline-block;margin-bottom:20px;">
+                                <a data-fancybox="yacht" href="{{yacht_layout}}"><img style="max-height:500px;" src="{{yacht_layout}}"></a>
+                            </div>
+                        {% endif %}
+
+						<h4 class="yacht-title">Watersports</h4>
+						<div class="yacht-section wow fadeIn danzerpress-shadow-3 danzerpress-box danzerpress-white">
+							<table>
+                                {% if post.meta('dingy') %}
+									<tr><td>Dinghy</td><td>{{post.meta('dingy')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('dingy_hp') %}
+								    <tr><td>Dinghy HP</td><td>{{post.meta('dingy_hp')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('paddle') %}
+									<tr><td>Paddle Boards</td><td>{{post.meta('paddle')}}</td></tr>
+                                {% endif %}
+
+                                {% if post.meta('single_kayak') %}
+									<tr><td>Single Kayaks</td><td>{{post.meta('single_kayak')}}</td></tr>
+                                {% endif %}
+
+								{% if post.meta('double_kayak') %}
+									<tr><td>Double Kayaks</td><td>{{post.meta('double_kayak')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('adult_water_skis') %}
+									<tr><td>Adult Water-skis</td><td>{{post.meta('adult_water_skis')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('kid_water_skis') %}
+									<tr><td>Kids Water-skis</td><td>{{post.meta('kid_water_skis')}}</td></tr>
+								{% endif %}
+								
+                                {% if post.meta('wakeboard') %}
+									<tr><td>Wakeboards</td><td>{{post.meta('wakeboard')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('kneeboards') %}
+									<tr><td>Kneeboards</td><td>{{post.meta('kneeboards')}}</td></tr>
+								{% endif %}
+
+                                {% if post.meta('wave_runner') %}
+									<tr><td>WaveRunners</td><td>{{post.meta('wave_runner')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('jet_skis') %}
+									<tr><td>Jet Skis</td><td>{{post.meta('jet_skis')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('snorkel') %}
+									<tr><td>Snorkeling gear</td><td>{{post.meta('snorkel')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('tube') %}
+									<tr><td>Inflatable, towable tubes</td><td>{{post.meta('tube')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('fishing_gear') %}
+									<tr><td>Fishing Gear</td><td>{{post.meta('fishing_gear')}}</td></tr>
+								{% endif %}
+
+								{% if post.meta('scuba_diving') %}
+									<tr><td>Scuba Diving</td><td>{{post.meta('scuba_diving')}}</td></tr>
+								{% endif %}
+                                
+								{% if post.meta('scuba_compressor') %}
+									<tr><td>Scuba Compressor</td><td>{{post.meta('scuba_compressor')}}</td></tr>
+								{% endif %}
+							</table>
+						</div>
+                        
+                        {{price_details}}
+
+						<h4 class="yacht-title">Crew Profile</h4>
+						<div class="yacht-section wow fadeIn danzerpress-shadow-3 danzerpress-box danzerpress-white">
+                            {% if crew_info.crew_photo %}
+								<img src="{{crew_info.crew_photo}}"><br>
+                            {% endif %}
+                            {{crew_info.crew_profile}}
+						</div>
+						
+						<h4 class="yacht-title">Destinations / Sample Itenaries</h4>
+						{% include 'parts/destination-squares.twig' %}
+					</div>
+				</div>
+				<div id="" class="danzerpress-one-third">
+                    {% include 'parts/content-sidebar.twig' %}
+				</div>
+			</div>
+		</main><!-- #main -->
+	</div><!-- #primary -->
+
+    {% if fn('comments_open') or fn('get_comments_number') %}
+        <div class="danzerpress-comments">	
+            <div class="danzerpress-wrap" style="max-width: 900px;">
+                {{fn('comments_template')}}
+            </div>
+        </div>
+    {% endif %}
+</main>
+
+{{ fn('get_footer') }}

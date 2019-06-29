@@ -93,15 +93,31 @@ class Controller
 
     public function render()
     {
+        $template_stack = apply_filters('pre_render_template_stack', $this->template_stack);
+
         if (!empty($this->template) && !is_array($this->template)) {
             $template_base = basename($this->template, '.twig');
         } else {
-            $template_base = basename($this->template_stack[0], '.twig');
+            foreach($template_stack as $template) {
+                if (is_file(get_iyc_dir() . Timber::$dirname . '/' . $template)) {
+                    $template_base = basename($template, '.twig');
+                    break;
+                } elseif ( is_file(locate_template(Timber::$dirname . '/' . $template)) ) {
+                    $template_base = basename($template, '.twig');
+                    break;
+                }
+            }
         }
 
-        $template_stack = apply_filters('pre_render_template_stack', $this->template_stack);
         $context = apply_filters('pre_render_context', $this->context);
-        $context = apply_filters("pre_render_context_{$template_base}", $context);
+
+        /**
+         * TODO: Doesn't check for php templates
+         */
+        if (isset($template_base)) {
+            $context = apply_filters("pre_render_context_{$template_base}", $context);
+        }
+
         render($template_stack, $context);
     }
 }

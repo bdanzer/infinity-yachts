@@ -17,6 +17,15 @@ define('IYC_PLUGIN_DIR', plugin_dir_path( __FILE__ ));
 require_once IYC_PLUGIN_DIR . '/vendor/autoload.php';
 require_once IYC_PLUGIN_DIR . 'includes/lib/core-functions.php';
 
+$IYC_Checker = Puc_v4_Factory::buildUpdateChecker(
+	'https://github.com/bdanzer/infinity-yachts',
+	__FILE__,
+	'infinity-yachts'
+);
+
+$IYC_Checker->setAuthentication('5900e7b4b8248adae49d98d364d55b51d29843f4');
+$IYC_Checker->setBranch('master');
+
 /**
  * Init Plugin
  */

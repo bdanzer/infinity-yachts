@@ -19,7 +19,8 @@
         }
       },
     "require": {
-        "timber/timber": "^1.9"
+        "timber/timber": "^1.9",
+        "yahnis-elsts/plugin-update-checker": "^4.6"
     },
     "autoload": {
         "psr-4": {

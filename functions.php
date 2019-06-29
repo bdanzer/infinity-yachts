@@ -4,7 +4,7 @@ Plugin Name: DanzerPress CYA Feeds
 Description: CYA WordPress Integration
 Plugin URI:  https://danzerpress.com
 Author:      Britt Danzer
-Version:     2.0
+Version:     2.1.0
 Text Domain: IYC
 */
 

@@ -23,7 +23,6 @@ $IYC_Checker = Puc_v4_Factory::buildUpdateChecker(
 	'infinity-yachts'
 );
 
-$IYC_Checker->setAuthentication('5900e7b4b8248adae49d98d364d55b51d29843f4');
 $IYC_Checker->setBranch('master');
 
 /**
